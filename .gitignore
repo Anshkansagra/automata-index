@@ -1,0 +1,6 @@
+# Claude Code session/tooling config — local only, not part of the app
+.claude/
+
+# OS junk
+.DS_Store
+Thumbs.db
