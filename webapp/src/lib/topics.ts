@@ -5,6 +5,28 @@ export type TopicGroup = {
 
 export const TOPIC_TAXONOMY: TopicGroup[] = [
   {
+    category: "Machine Learning",
+    terms: [
+      "Supervised Learning",
+      "Unsupervised Learning",
+      "Semi-Supervised Learning",
+      "Regression",
+      "Classification",
+      "Clustering",
+      "Decision Trees",
+      "Random Forests",
+      "Support Vector Machines",
+      "Gradient Boosting",
+      "Ensemble Methods",
+      "Bayesian Learning",
+      "Feature Engineering",
+      "Dimensionality Reduction",
+      "Hyperparameter Tuning",
+      "Model Evaluation",
+      "AutoML",
+    ],
+  },
+  {
     category: "Artificial Intelligence",
     terms: [
       "Explainable AI",
