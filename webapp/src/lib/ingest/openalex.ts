@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { isLikelyRealPdfUrl } from "@/lib/ingest/pdfUrl";
 import type { Paper } from "@/lib/types";
 
 const OPENALEX_URL = "https://api.openalex.org/works";
@@ -46,11 +47,18 @@ function extractWorkId(fullId: string): string {
   return fullId.split("/").pop() ?? fullId;
 }
 
+// OpenAlex's primary_location.pdf_url is documented as "a direct link to a
+// PDF" but is unreliable in practice — for some Elsevier/Wiley records it's
+// actually a publisher API endpoint that returns raw XML metadata, not a
+// PDF. open_access.oa_url (sourced from Unpaywall) is far more trustworthy,
+// so that's the only field we use; anything that still looks like a
+// publisher API call gets rejected outright rather than shown as "free PDF".
 function mapWork(work: OpenAlexWork): Omit<Paper, "id" | "created_at"> | null {
   const title = work.title || work.display_name;
   if (!title) return null;
 
-  const pdfUrl = work.open_access?.oa_url || work.primary_location?.pdf_url || null;
+  const oaUrl = work.open_access?.oa_url;
+  const pdfUrl = oaUrl && isLikelyRealPdfUrl(oaUrl) ? oaUrl : null;
   const landingPageUrl =
     work.primary_location?.landing_page_url ||
     (work.doi ? work.doi : `https://openalex.org/${extractWorkId(work.id)}`);

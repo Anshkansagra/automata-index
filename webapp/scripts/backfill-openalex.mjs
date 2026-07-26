@@ -38,10 +38,23 @@ function extractWorkId(fullId) {
   return fullId.split("/").pop() ?? fullId;
 }
 
+function isLikelyRealPdfUrl(url) {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.startsWith("api.")) return false;
+    if (parsed.pathname.includes("/content/article/")) return false;
+    if (parsed.searchParams.has("httpAccept")) return false;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function mapWork(work) {
   const title = work.title || work.display_name;
   if (!title) return null;
-  const pdfUrl = work.open_access?.oa_url || work.primary_location?.pdf_url || null;
+  const oaUrl = work.open_access?.oa_url;
+  const pdfUrl = oaUrl && isLikelyRealPdfUrl(oaUrl) ? oaUrl : null;
   const landingPageUrl =
     work.primary_location?.landing_page_url ||
     (work.doi ? work.doi : `https://openalex.org/${extractWorkId(work.id)}`);
