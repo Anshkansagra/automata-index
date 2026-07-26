@@ -27,6 +27,12 @@ export async function Navbar() {
           {user ? (
             <>
               <Link
+                href="/saved"
+                className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:block dark:text-zinc-400 dark:hover:text-zinc-50"
+              >
+                Saved
+              </Link>
+              <Link
                 href="/dashboard"
                 className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
               >

@@ -1,11 +1,20 @@
 import type { Paper } from "@/lib/types";
+import { SaveButton } from "@/components/SaveButton";
 
 function truncate(text: string, max: number) {
   if (text.length <= max) return text;
   return text.slice(0, max).trimEnd() + "…";
 }
 
-export function PaperCard({ paper }: { paper: Paper }) {
+export function PaperCard({
+  paper,
+  isLoggedIn = false,
+  isSaved = false,
+}: {
+  paper: Paper;
+  isLoggedIn?: boolean;
+  isSaved?: boolean;
+}) {
   return (
     <article className="rounded-lg border border-zinc-200 p-5 dark:border-zinc-800">
       <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
@@ -60,6 +69,7 @@ export function PaperCard({ paper }: { paper: Paper }) {
         >
           Source page
         </a>
+        {isLoggedIn && <SaveButton paperId={paper.id} initialSaved={isSaved} />}
       </div>
     </article>
   );

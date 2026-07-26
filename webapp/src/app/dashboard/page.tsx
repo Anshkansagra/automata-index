@@ -3,6 +3,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { supabasePublic } from "@/lib/supabase/public";
 import { getPapers } from "@/lib/queries";
+import { getSavedPaperIdSet } from "@/lib/savedPapers";
 import { PaperCard } from "@/components/PaperCard";
 
 async function getStats() {
@@ -27,7 +28,11 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const [stats, recentPapers] = await Promise.all([getStats(), getPapers({ limit: 10 })]);
+  const [stats, recentPapers, savedIds] = await Promise.all([
+    getStats(),
+    getPapers({ limit: 10 }),
+    getSavedPaperIdSet(supabase, user.id),
+  ]);
   const name = (user.user_metadata?.full_name as string | undefined) || user.email;
 
   return (
@@ -60,17 +65,30 @@ export default async function DashboardPage() {
         <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
           Latest papers
         </h2>
-        <Link
-          href="/#browse"
-          className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-        >
-          Browse all →
-        </Link>
+        <div className="flex gap-4 text-sm font-medium">
+          <Link
+            href="/saved"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          >
+            Saved papers ({savedIds.size}) →
+          </Link>
+          <Link
+            href="/#browse"
+            className="text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+          >
+            Browse all →
+          </Link>
+        </div>
       </div>
 
       <div className="mt-4 flex flex-col gap-4">
         {recentPapers.map((paper) => (
-          <PaperCard key={paper.id} paper={paper} />
+          <PaperCard
+            key={paper.id}
+            paper={paper}
+            isLoggedIn={true}
+            isSaved={savedIds.has(paper.id)}
+          />
         ))}
       </div>
     </div>

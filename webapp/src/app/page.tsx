@@ -1,4 +1,6 @@
 import { getPapers } from "@/lib/queries";
+import { getSavedPaperIdSet } from "@/lib/savedPapers";
+import { createClient } from "@/lib/supabase/server";
 import { PaperCard } from "@/components/PaperCard";
 import { SearchBar } from "@/components/SearchBar";
 import { FilterPills } from "@/components/FilterPills";
@@ -11,7 +13,15 @@ export default async function Home({
   searchParams: Promise<{ q?: string; source?: string }>;
 }) {
   const { q = "", source } = await searchParams;
-  const papers = await getPapers({ q, source });
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const [papers, savedIds] = await Promise.all([
+    getPapers({ q, source }),
+    user ? getSavedPaperIdSet(supabase, user.id) : Promise.resolve(new Set<string>()),
+  ]);
 
   return (
     <div className="bg-zinc-50 dark:bg-black">
@@ -34,7 +44,14 @@ export default async function Home({
               No papers found. Try a different search term.
             </p>
           ) : (
-            papers.map((paper) => <PaperCard key={paper.id} paper={paper} />)
+            papers.map((paper) => (
+              <PaperCard
+                key={paper.id}
+                paper={paper}
+                isLoggedIn={!!user}
+                isSaved={savedIds.has(paper.id)}
+              />
+            ))
           )}
         </div>
       </main>

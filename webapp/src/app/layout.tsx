@@ -59,6 +59,27 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col" suppressHydrationWarning>
+        <script
+          type="application/ld+json"
+          // Tells Google this is the canonical "Cortexa" web entity, and
+          // (via SearchAction) makes it eligible for a sitelinks search box
+          // directly in Google's results for branded searches.
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "Cortexa",
+              alternateName: "Cortexa Research Index",
+              url: SITE_URL,
+              description: DESCRIPTION,
+              potentialAction: {
+                "@type": "SearchAction",
+                target: `${SITE_URL}/?q={search_term_string}`,
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
         <Navbar />
         <div className="flex-1">{children}</div>
       </body>
