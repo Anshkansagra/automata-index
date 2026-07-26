@@ -4,3 +4,6 @@
 # OS junk
 .DS_Store
 Thumbs.db
+
+# Sensitive local file — never publish account recovery codes
+recovery-codes.txt

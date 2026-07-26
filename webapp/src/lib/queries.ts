@@ -1,12 +1,6 @@
 import { supabasePublic as supabase } from "@/lib/supabase/public";
 import type { Paper } from "@/lib/types";
 
-// PostgREST's `.or()` filter syntax uses `,` and `()` as control characters —
-// strip them from user input so a search term can't break the filter string.
-function sanitizeForOr(term: string) {
-  return term.replace(/[,()]/g, " ").trim();
-}
-
 export async function getPapers({
   q,
   source,
@@ -16,6 +10,23 @@ export async function getPapers({
   source?: string;
   limit?: number;
 }): Promise<Paper[]> {
+  // With a search term: relevance-ranked full-text search (websearch syntax —
+  // "introduction to machine learning" matches papers containing those words
+  // anywhere in title/abstract, ranked by relevance, not one exact phrase).
+  if (q && q.trim()) {
+    const { data, error } = await supabase.rpc("search_papers", {
+      search_query: q.trim(),
+      filter_source: source ?? null,
+      result_limit: limit,
+    });
+
+    if (error) {
+      throw new Error(`Failed to search papers: ${error.message}`);
+    }
+    return data as Paper[];
+  }
+
+  // No search term: plain browse, newest first.
   let query = supabase
     .from("papers")
     .select("*")
@@ -24,11 +35,6 @@ export async function getPapers({
 
   if (source) {
     query = query.eq("source", source);
-  }
-
-  if (q && q.trim()) {
-    const term = sanitizeForOr(q);
-    query = query.or(`title.ilike.%${term}%,abstract.ilike.%${term}%`);
   }
 
   const { data, error } = await query;

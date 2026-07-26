@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { NeuralNetwork } from "@/components/illustrations";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/dashboard");
+    router.push("/");
     router.refresh();
   }
 
@@ -84,6 +85,14 @@ export default function LoginPage() {
           >
             {status === "loading" ? "Logging in…" : "Log in"}
           </button>
+
+          <div className="flex items-center gap-3 text-xs text-zinc-400">
+            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+            or
+            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+          </div>
+
+          <GoogleSignInButton />
 
           <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
             New here?{" "}

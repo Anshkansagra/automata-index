@@ -8,6 +8,8 @@ import {
   DigitalTwin,
   WirelessSatellite,
   HumanMachineCollab,
+  GenerativeAI,
+  HealthcareAI,
 } from "@/components/illustrations";
 
 const SLIDES = [
@@ -46,6 +48,18 @@ const SLIDES = [
     headline: "Where Human Intent Meets Machine Precision",
     sub: "HRI, shared autonomy, and collaborative systems research.",
     Visual: HumanMachineCollab,
+  },
+  {
+    tag: "Generative AI & NLP",
+    headline: "From Language Models to Multimodal Generation",
+    sub: "LLMs, transformers, and generative research — free to read.",
+    Visual: GenerativeAI,
+  },
+  {
+    tag: "Healthcare AI",
+    headline: "Machine Learning at the Bedside",
+    sub: "Medical imaging, diagnostics, and clinical ML research.",
+    Visual: HealthcareAI,
   },
 ];
 

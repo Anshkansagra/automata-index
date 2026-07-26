@@ -13,10 +13,36 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = "https://automata-index.vercel.app";
+const TITLE = "Automata Index — Free Robotics, ML & AI Research";
+const DESCRIPTION =
+  "A free, open-access index of robotics, machine learning, deep learning, and AI research from arXiv, MDPI, IEEE Access, CrossRef open-access publishers, and more.";
+
 export const metadata: Metadata = {
-  title: "Automata Index — Free Robotics, ML & AI Research",
-  description:
-    "A free, open-access index of robotics, machine learning, deep learning, and AI research from arXiv, MDPI, IEEE Access, and more.",
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  keywords: [
+    "robotics research papers",
+    "machine learning papers",
+    "deep learning research",
+    "free research papers",
+    "open access AI papers",
+    "autonomous vehicles research",
+    "neural networks papers",
+  ],
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: "Automata Index",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

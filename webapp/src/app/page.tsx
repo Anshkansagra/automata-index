@@ -3,6 +3,7 @@ import { PaperCard } from "@/components/PaperCard";
 import { SearchBar } from "@/components/SearchBar";
 import { FilterPills } from "@/components/FilterPills";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
+import { TopicExplorer } from "@/components/TopicExplorer";
 
 export default async function Home({
   searchParams,
@@ -19,6 +20,13 @@ export default async function Home({
       <main id="browse" className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-16 sm:px-8">
         <SearchBar defaultValue={q} />
         <FilterPills q={q} activeSource={source ?? null} />
+
+        <div>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            Explore by topic
+          </h2>
+          <TopicExplorer />
+        </div>
 
         <div className="flex flex-col gap-4">
           {papers.length === 0 ? (

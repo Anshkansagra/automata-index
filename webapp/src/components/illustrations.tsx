@@ -146,6 +146,41 @@ export function WirelessSatellite() {
   );
 }
 
+// Generative AI / NLP — a conversational exchange rendered as abstract text lines.
+export function GenerativeAI() {
+  return (
+    <svg viewBox="0 0 400 300" className="h-full w-full" fill="none">
+      <g stroke="currentColor" strokeWidth="1.5" opacity="0.6">
+        <path d="M60 80 h150 a14 14 0 0 1 14 14 v50 a14 14 0 0 1 -14 14 h-100 l-30 30 v-30 h-20 a14 14 0 0 1 -14 -14 v-50 a14 14 0 0 1 14 -14 Z" />
+        <path d="M190 170 h150 a14 14 0 0 1 14 14 v40 a14 14 0 0 1 -14 14 h-20 v25 l-30 -25 h-100 a14 14 0 0 1 -14 -14 v-40 a14 14 0 0 1 14 -14 Z" />
+      </g>
+      <g stroke="currentColor" opacity="0.45">
+        <line x1="80" y1="105" x2="180" y2="105" />
+        <line x1="80" y1="122" x2="160" y2="122" />
+        <line x1="210" y1="195" x2="310" y2="195" />
+        <line x1="210" y1="212" x2="280" y2="212" />
+      </g>
+    </svg>
+  );
+}
+
+// Healthcare AI — medical cross with a monitored pulse line.
+export function HealthcareAI() {
+  return (
+    <svg viewBox="0 0 400 300" className="h-full w-full" fill="none">
+      <g stroke="currentColor" strokeWidth="1.5" opacity="0.6">
+        <path d="M180 90 h40 v40 h40 v40 h-40 v40 h-40 v-40 h-40 v-40 h40 Z" />
+        <path d="M60 220 h60 l15 -35 20 60 20 -80 15 55 h150" />
+      </g>
+      <g fill="currentColor" opacity="0.5">
+        <circle cx="200" cy="110" r="3" />
+        <circle cx="60" cy="220" r="3" />
+        <circle cx="340" cy="220" r="3" />
+      </g>
+    </svg>
+  );
+}
+
 // Human-machine collaboration.
 export function HumanMachineCollab() {
   return (

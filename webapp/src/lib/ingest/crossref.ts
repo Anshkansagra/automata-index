@@ -26,6 +26,11 @@ type CrossrefProfile = {
 const PROFILES: CrossrefProfile[] = [
   { name: "MDPI", prefixFilter: "10.3390", requireCcLicense: false },
   { name: "IEEE (open access)", containerTitle: "IEEE Access", requireCcLicense: true },
+  // No publisher restriction at all — requireCcLicense is the only gate.
+  // This is what actually captures Springer, Wiley, Elsevier, PLOS,
+  // Frontiers, Hindawi, etc.: whichever publisher, an article only survives
+  // if ITS OWN CrossRef record carries a verified Creative Commons license.
+  { name: "Open access (any publisher)", requireCcLicense: true },
 ];
 
 type CrossrefItem = {

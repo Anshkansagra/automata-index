@@ -81,7 +81,18 @@ export async function ingestArxiv({ pages = 4, pageSize = 250 } = {}) {
     const entries = await fetchPage(searchQuery, page * pageSize, pageSize);
     if (entries.length === 0) break;
 
-    const rows = entries.map(mapEntry);
+    // A handful of arXiv entries share an externally-registered DOI (e.g.
+    // cross-listed or later-published versions of the same work). Postgres
+    // can't apply ON CONFLICT twice to the same target within one bulk
+    // upsert, so drop later duplicates within this batch before writing.
+    const seenDois = new Set<string>();
+    const rows = entries.map(mapEntry).filter((row) => {
+      if (!row.doi) return true;
+      if (seenDois.has(row.doi)) return false;
+      seenDois.add(row.doi);
+      return true;
+    });
+
     const { error, count } = await supabaseAdmin
       .from("papers")
       .upsert(rows, { onConflict: "source,source_id", count: "exact" });

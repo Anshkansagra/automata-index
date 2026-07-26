@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { RoboticGripper } from "@/components/illustrations";
+import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [affiliation, setAffiliation] = useState("");
   const [email, setEmail] = useState("");
@@ -19,7 +22,7 @@ export default function RegisterPage() {
     setErrorMessage("");
 
     const supabase = createClient();
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -31,6 +34,14 @@ export default function RegisterPage() {
     if (error) {
       setStatus("error");
       setErrorMessage(error.message);
+      return;
+    }
+
+    // If email confirmation is disabled, signUp already returns a live
+    // session — go straight to the papers, no inbox-checking needed.
+    if (data.session) {
+      router.push("/");
+      router.refresh();
       return;
     }
 
@@ -126,6 +137,14 @@ export default function RegisterPage() {
               >
                 {status === "loading" ? "Creating account…" : "Create account"}
               </button>
+
+              <div className="flex items-center gap-3 text-xs text-zinc-400">
+                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+                or
+                <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+              </div>
+
+              <GoogleSignInButton />
             </>
           )}
 
