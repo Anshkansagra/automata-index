@@ -1,0 +1,42 @@
+import { redirect } from "next/navigation";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
+import { ProfileForm } from "@/components/ProfileForm";
+
+export default async function ProfilePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const hasPassword = (user.identities ?? []).some((i) => i.provider === "email");
+  const provider = user.app_metadata?.provider ?? "email";
+
+  return (
+    <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Profile</h1>
+        <Link
+          href="/dashboard"
+          className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+        >
+          ← Dashboard
+        </Link>
+      </div>
+
+      <div className="mt-6">
+        <ProfileForm
+          email={user.email ?? ""}
+          fullName={(user.user_metadata?.full_name as string) ?? ""}
+          affiliation={(user.user_metadata?.affiliation as string) ?? ""}
+          hasPassword={hasPassword}
+          provider={provider}
+        />
+      </div>
+    </div>
+  );
+}

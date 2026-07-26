@@ -34,9 +34,15 @@ export async function Navbar() {
               </Link>
               <Link
                 href="/dashboard"
-                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+                className="hidden text-sm font-medium text-zinc-600 hover:text-zinc-900 sm:block dark:text-zinc-400 dark:hover:text-zinc-50"
               >
                 Dashboard
+              </Link>
+              <Link
+                href="/profile"
+                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
+              >
+                Profile
               </Link>
               <SignOutButton />
             </>
