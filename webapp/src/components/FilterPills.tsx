@@ -5,6 +5,7 @@ const SOURCES: { label: string; value: string | null }[] = [
   { label: "arXiv", value: "arxiv" },
   { label: "CORE", value: "core" },
   { label: "MDPI / IEEE (OA)", value: "crossref" },
+  { label: "OpenAlex", value: "openalex" },
 ];
 
 function buildHref(q: string, source: string | null) {
