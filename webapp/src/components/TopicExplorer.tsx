@@ -23,7 +23,7 @@ export function TopicExplorer() {
               onClick={() => setOpenCategory(isOpen ? null : group.category)}
               className={`bg-white px-3 py-2.5 text-left text-sm font-medium transition-colors dark:bg-zinc-950 ${
                 isOpen
-                  ? "text-blue-600 dark:text-blue-400"
+                  ? "text-accent"
                   : "text-zinc-700 hover:text-zinc-950 dark:text-zinc-300 dark:hover:text-white"
               }`}
             >
@@ -40,7 +40,7 @@ export function TopicExplorer() {
               <button
                 key={term}
                 onClick={() => searchFor(term)}
-                className="rounded-full border border-zinc-300 px-3 py-1 text-xs text-zinc-600 transition-colors hover:border-blue-500 hover:text-blue-600 dark:border-zinc-700 dark:text-zinc-400 dark:hover:border-blue-400 dark:hover:text-blue-400"
+                className="rounded-full border border-zinc-300 px-3 py-1 text-xs text-zinc-600 transition-colors hover:border-accent hover:text-accent dark:border-zinc-700 dark:text-zinc-400"
               >
                 {term}
               </button>

@@ -33,8 +33,8 @@ export function FilterPills({
             href={buildHref(q, value)}
             className={`rounded-full border px-3 py-1 text-sm transition-colors ${
               isActive
-                ? "border-zinc-900 bg-zinc-900 text-white dark:border-zinc-50 dark:bg-zinc-50 dark:text-zinc-900"
-                : "border-zinc-300 text-zinc-700 hover:border-zinc-500 dark:border-zinc-700 dark:text-zinc-300"
+                ? "border-accent bg-accent text-white"
+                : "border-zinc-300 text-zinc-700 hover:border-accent hover:text-accent dark:border-zinc-700 dark:text-zinc-300"
             }`}
           >
             {label}

@@ -32,7 +32,7 @@ export function SidebarClient({ isLoggedIn }: Props) {
       {/* Mobile top bar */}
       <div className="sticky top-0 z-40 flex h-14 items-center justify-between border-b border-zinc-200 bg-white/80 px-4 backdrop-blur md:hidden dark:border-zinc-800 dark:bg-black/80">
         <Link href="/" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-zinc-900 dark:text-zinc-50">
-          <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
+          <span className="inline-block h-2 w-2 rounded-full bg-accent" />
           CORTEXA
         </Link>
         <button
@@ -67,7 +67,7 @@ export function SidebarClient({ isLoggedIn }: Props) {
           href="/"
           className="mb-6 hidden items-center gap-2 text-sm font-semibold tracking-wide text-zinc-900 md:flex dark:text-zinc-50"
         >
-          <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
+          <span className="inline-block h-2 w-2 rounded-full bg-accent" />
           CORTEXA
         </Link>
 
@@ -81,7 +81,7 @@ export function SidebarClient({ isLoggedIn }: Props) {
                 onClick={() => setOpen(false)}
                 className={`rounded-md px-3 py-2 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-zinc-900 text-white dark:bg-zinc-50 dark:text-zinc-900"
+                    ? "bg-accent text-white"
                     : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
                 }`}
               >
@@ -106,7 +106,7 @@ export function SidebarClient({ isLoggedIn }: Props) {
               <Link
                 href="/register"
                 onClick={() => setOpen(false)}
-                className="rounded-full bg-zinc-900 px-3 py-2 text-center text-sm font-medium text-white hover:bg-zinc-700 dark:bg-zinc-50 dark:text-zinc-900"
+                className="rounded-full bg-accent px-3 py-2 text-center text-sm font-medium text-white hover:bg-accent-hover"
               >
                 Sign up
               </Link>

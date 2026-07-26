@@ -75,10 +75,10 @@ export function HeroSlideshow() {
   const Visual = slide.Visual;
 
   return (
-    <section className="relative overflow-hidden bg-zinc-950 text-white">
+    <section className="relative overflow-hidden bg-gradient-to-br from-zinc-950 via-zinc-950 to-indigo-950 text-white">
       <div className="mx-auto grid max-w-6xl grid-cols-1 items-center gap-8 px-4 py-20 sm:px-8 md:grid-cols-2 md:py-28">
         <div>
-          <span className="inline-block rounded-full border border-zinc-700 px-3 py-1 text-xs font-medium uppercase tracking-widest text-zinc-400">
+          <span className="inline-block rounded-full border border-accent/40 bg-accent-soft/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-accent">
             {slide.tag}
           </span>
           <h1 className="mt-4 text-3xl font-semibold leading-tight tracking-tight sm:text-4xl md:text-5xl">
@@ -93,14 +93,14 @@ export function HeroSlideshow() {
                 aria-label={`Slide ${i + 1}`}
                 onClick={() => setIndex(i)}
                 className={`h-1.5 rounded-full transition-all ${
-                  i === index ? "w-8 bg-white" : "w-4 bg-zinc-700"
+                  i === index ? "w-8 bg-accent" : "w-4 bg-zinc-700"
                 }`}
               />
             ))}
           </div>
         </div>
 
-        <div className="h-64 text-blue-400 opacity-80 md:h-80">
+        <div className="h-64 text-accent opacity-90 md:h-80">
           <Visual />
         </div>
       </div>

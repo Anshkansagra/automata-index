@@ -79,7 +79,7 @@ export function ProfileForm({ email, fullName, affiliation, hasPassword, provide
             <button
               type="submit"
               disabled={infoStatus === "saving"}
-              className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+              className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-50"
             >
               {infoStatus === "saving" ? "Saving…" : "Save changes"}
             </button>
@@ -118,7 +118,7 @@ export function ProfileForm({ email, fullName, affiliation, hasPassword, provide
                 <button
                   type="submit"
                   disabled={passwordStatus === "saving"}
-                  className="rounded-full bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+                  className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent-hover disabled:opacity-50"
                 >
                   {passwordStatus === "saving" ? "Updating…" : "Change password"}
                 </button>

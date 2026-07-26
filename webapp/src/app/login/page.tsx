@@ -34,12 +34,12 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-64px)]">
-      <div className="hidden w-1/2 flex-col justify-center bg-zinc-950 px-16 text-white sm:flex">
+      <div className="hidden w-1/2 flex-col justify-center bg-gradient-to-br from-zinc-950 via-zinc-950 to-indigo-950 px-16 text-white sm:flex">
         <h2 className="text-3xl font-semibold tracking-tight">Welcome back.</h2>
         <p className="mt-4 max-w-sm text-zinc-400">
           Pick up where you left off — your saved papers and searches are waiting.
         </p>
-        <div className="mt-10 h-56 text-blue-400 opacity-80">
+        <div className="mt-10 h-56 text-accent opacity-90">
           <NeuralNetwork />
         </div>
       </div>
@@ -81,7 +81,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={status === "loading"}
-            className="w-full rounded-full bg-zinc-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+            className="w-full rounded-full bg-accent py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
           >
             {status === "loading" ? "Logging in…" : "Log in"}
           </button>
@@ -96,7 +96,7 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
             New here?{" "}
-            <Link href="/register" className="font-medium text-zinc-900 hover:underline dark:text-zinc-50">
+            <Link href="/register" className="font-medium text-accent hover:underline">
               Create an account
             </Link>
           </p>

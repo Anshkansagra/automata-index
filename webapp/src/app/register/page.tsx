@@ -50,7 +50,7 @@ export default function RegisterPage() {
 
   return (
     <div className="flex min-h-[calc(100vh-64px)]">
-      <div className="hidden w-1/2 flex-col justify-center bg-zinc-950 px-16 text-white sm:flex">
+      <div className="hidden w-1/2 flex-col justify-center bg-gradient-to-br from-zinc-950 via-zinc-950 to-indigo-950 px-16 text-white sm:flex">
         <h2 className="text-3xl font-semibold tracking-tight">
           Join the index.
         </h2>
@@ -58,7 +58,7 @@ export default function RegisterPage() {
           Free access to robotics, ML, and AI research — no paywalls, ever.
           Create an account to save papers and get personalized digests.
         </p>
-        <div className="mt-10 h-56 text-blue-400 opacity-80">
+        <div className="mt-10 h-56 text-accent opacity-90">
           <RoboticGripper />
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="w-full rounded-full bg-zinc-900 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50 dark:bg-zinc-50 dark:text-zinc-900"
+                className="w-full rounded-full bg-accent py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
               >
                 {status === "loading" ? "Creating account…" : "Create account"}
               </button>
@@ -150,7 +150,7 @@ export default function RegisterPage() {
 
           <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
             Already have an account?{" "}
-            <Link href="/login" className="font-medium text-zinc-900 hover:underline dark:text-zinc-50">
+            <Link href="/login" className="font-medium text-accent hover:underline">
               Log in
             </Link>
           </p>
