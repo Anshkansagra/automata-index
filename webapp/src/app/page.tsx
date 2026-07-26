@@ -6,6 +6,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { FilterPills } from "@/components/FilterPills";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
 import { TopicExplorer } from "@/components/TopicExplorer";
+import { SaveSearchButton } from "@/components/SaveSearchButton";
 
 export default async function Home({
   searchParams,
@@ -29,6 +30,9 @@ export default async function Home({
 
       <main id="browse" className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-16 sm:px-8">
         <SearchBar defaultValue={q} />
+        {q.trim() && (
+          <SaveSearchButton query={q} source={source ?? null} isLoggedIn={!!user} />
+        )}
         <FilterPills q={q} activeSource={source ?? null} />
 
         <div>

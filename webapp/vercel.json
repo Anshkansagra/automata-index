@@ -2,6 +2,7 @@
   "crons": [
     { "path": "/api/ingest/arxiv", "schedule": "0 3 * * *" },
     { "path": "/api/ingest/crossref", "schedule": "0 4 * * *" },
-    { "path": "/api/ingest/core", "schedule": "0 5 * * *" }
+    { "path": "/api/ingest/core", "schedule": "0 5 * * *" },
+    { "path": "/api/digest/send", "schedule": "0 6 * * *" }
   ]
 }
