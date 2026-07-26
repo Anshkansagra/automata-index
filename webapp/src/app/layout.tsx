@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 const SITE_URL = "https://automata-index.vercel.app";
-const TITLE = "Automata Index — Free Robotics, ML & AI Research";
+const TITLE = "Cortexa — Free Robotics, ML & AI Research";
 const DESCRIPTION =
   "A free, open-access index of robotics, machine learning, deep learning, and AI research from arXiv, MDPI, IEEE Access, CrossRef open-access publishers, and more.";
 
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
     url: SITE_URL,
-    siteName: "Automata Index",
+    siteName: "Cortexa",
     type: "website",
   },
   twitter: {

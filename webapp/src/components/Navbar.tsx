@@ -13,7 +13,7 @@ export async function Navbar() {
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-8">
         <Link href="/" className="flex items-center gap-2 text-sm font-semibold tracking-wide text-zinc-900 dark:text-zinc-50">
           <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
-          AUTOMATA INDEX
+          CORTEXA
         </Link>
 
         <div className="flex items-center gap-4">

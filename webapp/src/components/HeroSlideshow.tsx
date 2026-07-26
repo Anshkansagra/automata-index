@@ -15,7 +15,7 @@ import {
 const SLIDES = [
   {
     tag: "Robotics",
-    headline: "Indexing the Future of Automata & Machine Intelligence",
+    headline: "Indexing the Future of Cognition & Machine Intelligence",
     sub: "Free, open-access research on manipulation, locomotion, and embodied AI.",
     Visual: RoboticsArm,
   },
