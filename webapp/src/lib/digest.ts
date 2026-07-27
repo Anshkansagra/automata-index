@@ -80,6 +80,14 @@ export async function sendDigests() {
   const processedSearchIds: string[] = [];
 
   for (const [userId, userSearches] of byUser) {
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
+    if (userError || !userData.user?.email) continue;
+
+    // Respect the user's notification preference — skip entirely (don't
+    // even advance last_notified_at) so a paused user catches up on
+    // whatever they missed once they turn it back on.
+    if (userData.user.user_metadata?.digest_emails_enabled === false) continue;
+
     const sections: { search: SavedSearch; papers: Paper[] }[] = [];
 
     for (const search of userSearches) {
@@ -89,9 +97,6 @@ export async function sendDigests() {
     }
 
     if (sections.length === 0) continue;
-
-    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId);
-    if (userError || !userData.user?.email) continue;
 
     await sendEmail({
       to: userData.user.email,

@@ -30,9 +30,16 @@ export default async function ProfilePage() {
 
       <div className="mt-6">
         <ProfileForm
+          userId={user.id}
           email={user.email ?? ""}
           fullName={(user.user_metadata?.full_name as string) ?? ""}
           affiliation={(user.user_metadata?.affiliation as string) ?? ""}
+          avatarUrl={
+            (user.user_metadata?.avatar_url as string) ??
+            (user.user_metadata?.picture as string) ??
+            null
+          }
+          notificationsEnabled={user.user_metadata?.digest_emails_enabled !== false}
           hasPassword={hasPassword}
           provider={provider}
         />
