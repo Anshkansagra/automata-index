@@ -21,7 +21,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const OPENALEX_URL = "https://api.openalex.org/works";
 const ARXIV_SOURCE_ID = "S4306400194";
 const TOPIC_QUERY =
-  'robotics OR "machine learning" OR "deep learning" OR "neural network" OR "autonomous vehicle" OR "internet of vehicles" OR "digital twin" OR "computer vision" OR "generative AI" OR "human-machine collaboration" OR "wireless communication" OR ADAS OR "satellite navigation"';
+  'robotics OR "machine learning" OR "deep learning" OR "neural network" OR "autonomous vehicle" OR "internet of vehicles" OR "digital twin" OR "computer vision" OR "generative AI" OR "human-machine collaboration" OR "wireless communication" OR ADAS OR "satellite navigation" OR VLSI OR "chip design" OR semiconductor';
 
 function reconstructAbstract(index) {
   if (!index) return null;

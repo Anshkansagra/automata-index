@@ -5,7 +5,7 @@ import type { Paper } from "@/lib/types";
 const CROSSREF_URL = "https://api.crossref.org/works";
 
 const TOPIC_QUERY =
-  "robotics machine learning deep learning neural network autonomous vehicle internet of vehicles digital twin computer vision generative AI human-machine collaboration wireless communication ADAS advanced driver assistance satellite navigation";
+  "robotics machine learning deep learning neural network autonomous vehicle internet of vehicles digital twin computer vision generative AI human-machine collaboration wireless communication ADAS advanced driver assistance satellite navigation VLSI chip design semiconductor";
 
 type CrossrefProfile = {
   name: string;

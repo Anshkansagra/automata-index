@@ -13,4 +13,5 @@ export const ARXIV_CATEGORIES = [
   "cs.NI", // Networking (internet of vehicles, wireless communication)
   "eess.SP", // Signal Processing (wireless comms, satellite navigation)
   "cs.HC", // Human-Computer Interaction (human-machine collaboration)
+  "cs.AR", // Hardware Architecture (VLSI, chip design)
 ];

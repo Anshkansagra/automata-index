@@ -9,7 +9,7 @@ const OPENALEX_URL = "https://api.openalex.org/works";
 // single one of these ~20 terms in the same document" (which matched almost
 // nothing).
 const TOPIC_QUERY =
-  'robotics OR "machine learning" OR "deep learning" OR "neural network" OR "autonomous vehicle" OR "internet of vehicles" OR "digital twin" OR "computer vision" OR "generative AI" OR "human-machine collaboration" OR "wireless communication" OR ADAS OR "satellite navigation"';
+  'robotics OR "machine learning" OR "deep learning" OR "neural network" OR "autonomous vehicle" OR "internet of vehicles" OR "digital twin" OR "computer vision" OR "generative AI" OR "human-machine collaboration" OR "wireless communication" OR ADAS OR "satellite navigation" OR VLSI OR "chip design" OR semiconductor';
 
 // arXiv's OpenAlex source ID — excluded because we already ingest arXiv
 // directly and comprehensively; this keeps OpenAlex complementary instead
