@@ -42,6 +42,10 @@ export default async function ProfilePage() {
           notificationsEnabled={user.user_metadata?.digest_emails_enabled !== false}
           hasPassword={hasPassword}
           provider={provider}
+          mobile={(user.user_metadata?.mobile as string) ?? ""}
+          profession={(user.user_metadata?.profession as string) ?? ""}
+          linkedinUrl={(user.user_metadata?.linkedin_url as string) ?? ""}
+          githubUrl={(user.user_metadata?.github_url as string) ?? ""}
         />
       </div>
     </div>

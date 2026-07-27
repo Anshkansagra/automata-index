@@ -7,6 +7,7 @@ import { FilterPills } from "@/components/FilterPills";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
 import { TopicExplorer } from "@/components/TopicExplorer";
 import { SaveSearchButton } from "@/components/SaveSearchButton";
+import { logSearch } from "@/lib/searchHistory";
 
 export default async function Home({
   searchParams,
@@ -23,6 +24,10 @@ export default async function Home({
     getPapers({ q, source }),
     user ? getSavedPaperIdSet(supabase, user.id) : Promise.resolve(new Set<string>()),
   ]);
+
+  if (user && q.trim()) {
+    logSearch(supabase, user.id, q.trim());
+  }
 
   return (
     <div className="bg-zinc-50 dark:bg-black">

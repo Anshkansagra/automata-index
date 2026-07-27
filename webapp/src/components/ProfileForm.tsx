@@ -15,6 +15,10 @@ type Props = {
   notificationsEnabled: boolean;
   hasPassword: boolean;
   provider: string;
+  mobile: string;
+  profession: string;
+  linkedinUrl: string;
+  githubUrl: string;
 };
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -30,6 +34,36 @@ function inputClass() {
   return "w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900";
 }
 
+function labelClass() {
+  return "mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300";
+}
+
+// Crops to a centered square and re-encodes at a fixed resolution with
+// high-quality smoothing — fixes blurry avatars caused by uploading
+// arbitrary-sized/oddly-compressed source photos directly.
+async function resizeImageToSquare(file: File, size = 400): Promise<Blob> {
+  const bitmap = await createImageBitmap(file);
+  const canvas = document.createElement("canvas");
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  const minSide = Math.min(bitmap.width, bitmap.height);
+  const sx = (bitmap.width - minSide) / 2;
+  const sy = (bitmap.height - minSide) / 2;
+  ctx.drawImage(bitmap, sx, sy, minSide, minSide, 0, 0, size, size);
+
+  return new Promise((resolve, reject) => {
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error("Canvas export failed"))),
+      "image/jpeg",
+      0.92
+    );
+  });
+}
+
 export function ProfileForm({
   userId,
   email,
@@ -39,10 +73,18 @@ export function ProfileForm({
   notificationsEnabled,
   hasPassword,
   provider,
+  mobile,
+  profession,
+  linkedinUrl,
+  githubUrl,
 }: Props) {
   const router = useRouter();
   const [name, setName] = useState(fullName);
   const [aff, setAff] = useState(affiliation);
+  const [mobileNo, setMobileNo] = useState(mobile);
+  const [prof, setProf] = useState(profession);
+  const [linkedin, setLinkedin] = useState(linkedinUrl);
+  const [github, setGithub] = useState(githubUrl);
   const [infoStatus, setInfoStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState(avatarUrl);
@@ -52,7 +94,9 @@ export function ProfileForm({
   const [notifEnabled, setNotifEnabled] = useState(notificationsEnabled);
   const [notifStatus, setNotifStatus] = useState<"idle" | "saving" | "saved">("idle");
 
+  const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordStatus, setPasswordStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [passwordError, setPasswordError] = useState("");
 
@@ -64,7 +108,14 @@ export function ProfileForm({
     setInfoStatus("saving");
     const supabase = createClient();
     const { error } = await supabase.auth.updateUser({
-      data: { full_name: name, affiliation: aff },
+      data: {
+        full_name: name,
+        affiliation: aff,
+        mobile: mobileNo,
+        profession: prof,
+        linkedin_url: linkedin,
+        github_url: github,
+      },
     });
     setInfoStatus(error ? "error" : "saved");
   }
@@ -74,33 +125,30 @@ export function ProfileForm({
     if (!file) return;
 
     setAvatarStatus("uploading");
-    const supabase = createClient();
-    const ext = file.name.split(".").pop();
-    const path = `${userId}/avatar.${ext}`;
+    try {
+      const resized = await resizeImageToSquare(file);
+      const supabase = createClient();
+      const path = `${userId}/avatar.jpg`;
 
-    const { error: uploadError } = await supabase.storage
-      .from("avatars")
-      .upload(path, file, { upsert: true, cacheControl: "3600" });
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(path, resized, { upsert: true, cacheControl: "3600", contentType: "image/jpeg" });
 
-    if (uploadError) {
+      if (uploadError) throw uploadError;
+
+      const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+      const publicUrl = `${data.publicUrl}?t=${Date.now()}`; // bust cache after upload
+
+      const { error: updateError } = await supabase.auth.updateUser({
+        data: { avatar_url: publicUrl },
+      });
+      if (updateError) throw updateError;
+
+      setCurrentAvatarUrl(publicUrl);
+      setAvatarStatus("idle");
+    } catch {
       setAvatarStatus("error");
-      return;
     }
-
-    const { data } = supabase.storage.from("avatars").getPublicUrl(path);
-    const publicUrl = `${data.publicUrl}?t=${Date.now()}`; // bust cache after upload
-
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: { avatar_url: publicUrl },
-    });
-
-    if (updateError) {
-      setAvatarStatus("error");
-      return;
-    }
-
-    setCurrentAvatarUrl(publicUrl);
-    setAvatarStatus("idle");
   }
 
   async function toggleNotifications(checked: boolean) {
@@ -115,16 +163,37 @@ export function ProfileForm({
 
   async function changePassword(e: React.FormEvent) {
     e.preventDefault();
-    setPasswordStatus("saving");
     setPasswordError("");
+
+    if (newPassword !== confirmPassword) {
+      setPasswordStatus("error");
+      setPasswordError("New password and confirmation don't match.");
+      return;
+    }
+
+    setPasswordStatus("saving");
     const supabase = createClient();
+
+    // Re-verify the current password before allowing a change.
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email,
+      password: oldPassword,
+    });
+    if (verifyError) {
+      setPasswordStatus("error");
+      setPasswordError("Current password is incorrect.");
+      return;
+    }
+
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     if (error) {
       setPasswordStatus("error");
       setPasswordError(error.message);
       return;
     }
+    setOldPassword("");
     setNewPassword("");
+    setConfirmPassword("");
     setPasswordStatus("saved");
   }
 
@@ -172,16 +241,51 @@ export function ProfileForm({
 
         <form onSubmit={saveInfo} className="flex flex-col gap-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Full name
-            </label>
+            <label className={labelClass()}>Full name</label>
             <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass()} />
           </div>
           <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Institutional / academic affiliation
-            </label>
+            <label className={labelClass()}>Institutional / academic affiliation</label>
             <input value={aff} onChange={(e) => setAff(e.target.value)} className={inputClass()} />
+          </div>
+          <div>
+            <label className={labelClass()}>Mobile number</label>
+            <input
+              type="tel"
+              value={mobileNo}
+              onChange={(e) => setMobileNo(e.target.value)}
+              placeholder="Optional"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>Profession</label>
+            <input
+              value={prof}
+              onChange={(e) => setProf(e.target.value)}
+              placeholder="e.g. Student, Research Engineer"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>LinkedIn profile URL</label>
+            <input
+              type="url"
+              value={linkedin}
+              onChange={(e) => setLinkedin(e.target.value)}
+              placeholder="https://linkedin.com/in/…"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>GitHub profile URL</label>
+            <input
+              type="url"
+              value={github}
+              onChange={(e) => setGithub(e.target.value)}
+              placeholder="https://github.com/…"
+              className={inputClass()}
+            />
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -228,15 +332,30 @@ export function ProfileForm({
 
           {hasPassword ? (
             <form onSubmit={changePassword} className="flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-              <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                New password
-              </label>
+              <label className={labelClass()}>Current password</label>
+              <input
+                type="password"
+                required
+                value={oldPassword}
+                onChange={(e) => setOldPassword(e.target.value)}
+                className={inputClass()}
+              />
+              <label className={labelClass()}>New password</label>
               <input
                 type="password"
                 minLength={6}
                 required
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
+                className={inputClass()}
+              />
+              <label className={labelClass()}>Confirm new password</label>
+              <input
+                type="password"
+                minLength={6}
+                required
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
                 className={inputClass()}
               />
               <div className="flex items-center gap-3">
@@ -267,9 +386,7 @@ export function ProfileForm({
         <p className="mb-3 text-sm text-zinc-500 dark:text-zinc-400">
           Permanently deletes your account, saved papers, and saved searches. This cannot be undone.
         </p>
-        <label className="mb-2 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-          Type your email ({email}) to confirm
-        </label>
+        <label className={labelClass()}>Type your email ({email}) to confirm</label>
         <input
           value={deleteConfirm}
           onChange={(e) => setDeleteConfirm(e.target.value)}
