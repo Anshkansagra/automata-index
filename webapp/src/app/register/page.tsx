@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { RoboticGripper } from "@/components/illustrations";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { AuthFeatureGrid, AuthChecklist } from "@/components/AuthFeatureGrid";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -37,8 +37,6 @@ export default function RegisterPage() {
       return;
     }
 
-    // If email confirmation is disabled, signUp already returns a live
-    // session — go straight to the papers, no inbox-checking needed.
     if (data.session) {
       router.push("/");
       router.refresh();
@@ -49,32 +47,40 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)]">
-      <div className="hidden w-1/2 flex-col justify-center bg-gradient-to-br from-zinc-950 via-zinc-950 to-indigo-950 px-16 text-white sm:flex">
-        <h2 className="text-3xl font-semibold tracking-tight">
-          Join the index.
-        </h2>
-        <p className="mt-4 max-w-sm text-zinc-400">
-          Free access to robotics, ML, and AI research — no paywalls, ever.
-          Create an account to save papers and get personalized digests.
-        </p>
-        <div className="mt-10 h-56 text-accent opacity-90">
-          <RoboticGripper />
-        </div>
-      </div>
+    <div className="min-h-[calc(100vh-56px)] bg-gradient-to-br from-zinc-950 via-zinc-950 to-indigo-950 md:min-h-screen">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-24">
+        {/* Left: marketing content */}
+        <div className="text-white">
+          <span className="inline-block rounded-full border border-accent/40 bg-accent-soft/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-accent">
+            Free &amp; Open Access
+          </span>
+          <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">Cortexa</h1>
+          <p className="mt-2 text-lg text-zinc-300">Research Index for Robotics, ML &amp; AI</p>
+          <p className="mt-4 max-w-md text-zinc-400">
+            One search across arXiv, MDPI, IEEE Access, and more — every paper genuinely free to
+            read, verified open access, no scraped content.
+          </p>
 
-      <div className="flex w-full items-center justify-center px-6 py-16 sm:w-1/2">
-        <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
-            Create your account
-          </h1>
+          <div className="mt-8">
+            <AuthFeatureGrid />
+          </div>
+        </div>
+
+        {/* Right: account creation card */}
+        <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Create Account</h2>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Free — no credit card needed</p>
+
+          <div className="mt-5">
+            <AuthChecklist />
+          </div>
 
           {status === "sent" ? (
-            <p className="rounded-md bg-green-50 p-4 text-sm text-green-800 dark:bg-green-950 dark:text-green-300">
+            <p className="mt-6 rounded-md bg-green-50 p-4 text-sm text-green-800 dark:bg-green-950 dark:text-green-300">
               Check your inbox — we sent a confirmation link to {email}.
             </p>
           ) : (
-            <>
+            <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
               <div>
                 <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                   Full name
@@ -133,9 +139,9 @@ export default function RegisterPage() {
               <button
                 type="submit"
                 disabled={status === "loading"}
-                className="w-full rounded-full bg-accent py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
+                className="mt-1 w-full rounded-full bg-accent py-3 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
               >
-                {status === "loading" ? "Creating account…" : "Create account"}
+                {status === "loading" ? "Creating account…" : "Create Account"}
               </button>
 
               <div className="flex items-center gap-3 text-xs text-zinc-400">
@@ -145,16 +151,16 @@ export default function RegisterPage() {
               </div>
 
               <GoogleSignInButton />
-            </>
+            </form>
           )}
 
-          <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-5 text-center text-sm text-zinc-500 dark:text-zinc-400">
             Already have an account?{" "}
             <Link href="/login" className="font-medium text-accent hover:underline">
-              Log in
+              Login
             </Link>
           </p>
-        </form>
+        </div>
       </div>
     </div>
   );

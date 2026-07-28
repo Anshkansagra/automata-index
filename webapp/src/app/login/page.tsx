@@ -4,8 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { NeuralNetwork } from "@/components/illustrations";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { AuthFeatureGrid } from "@/components/AuthFeatureGrid";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -33,74 +33,85 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)]">
-      <div className="hidden w-1/2 flex-col justify-center bg-gradient-to-br from-zinc-950 via-zinc-950 to-indigo-950 px-16 text-white sm:flex">
-        <h2 className="text-3xl font-semibold tracking-tight">Welcome back.</h2>
-        <p className="mt-4 max-w-sm text-zinc-400">
-          Pick up where you left off — your saved papers and searches are waiting.
-        </p>
-        <div className="mt-10 h-56 text-accent opacity-90">
-          <NeuralNetwork />
+    <div className="min-h-[calc(100vh-56px)] bg-gradient-to-br from-zinc-950 via-zinc-950 to-indigo-950 md:min-h-screen">
+      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 md:grid-cols-2 md:items-center md:py-24">
+        {/* Left: marketing content */}
+        <div className="text-white">
+          <span className="inline-block rounded-full border border-accent/40 bg-accent-soft/10 px-3 py-1 text-xs font-medium uppercase tracking-widest text-accent">
+            Welcome back
+          </span>
+          <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-5xl">Cortexa</h1>
+          <p className="mt-2 text-lg text-zinc-300">Pick up right where you left off</p>
+          <p className="mt-4 max-w-md text-zinc-400">
+            Your saved papers, saved searches, and email digests are all waiting — log back in to
+            continue.
+          </p>
+
+          <div className="mt-8">
+            <AuthFeatureGrid />
+          </div>
         </div>
-      </div>
 
-      <div className="flex w-full items-center justify-center px-6 py-16 sm:w-1/2">
-        <form onSubmit={handleSubmit} className="w-full max-w-sm space-y-4">
-          <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Log in</h1>
+        {/* Right: login card */}
+        <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950">
+          <h2 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Login</h2>
+          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">Enter your details to continue</p>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Email
-            </label>
-            <input
-              required
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Email
+              </label>
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              />
+            </div>
 
-          <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Password
-            </label>
-            <input
-              required
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            />
-          </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Password
+              </label>
+              <input
+                required
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              />
+            </div>
 
-          {status === "error" && (
-            <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
-          )}
+            {status === "error" && (
+              <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
+            )}
 
-          <button
-            type="submit"
-            disabled={status === "loading"}
-            className="w-full rounded-full bg-accent py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent-hover disabled:opacity-50"
-          >
-            {status === "loading" ? "Logging in…" : "Log in"}
-          </button>
+            <button
+              type="submit"
+              disabled={status === "loading"}
+              className="mt-1 w-full rounded-full bg-accent py-3 text-sm font-semibold text-white shadow-lg shadow-accent/30 transition-colors hover:bg-accent-hover disabled:opacity-50"
+            >
+              {status === "loading" ? "Logging in…" : "Login"}
+            </button>
 
-          <div className="flex items-center gap-3 text-xs text-zinc-400">
-            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-            or
-            <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
-          </div>
+            <div className="flex items-center gap-3 text-xs text-zinc-400">
+              <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+              or
+              <div className="h-px flex-1 bg-zinc-200 dark:bg-zinc-800" />
+            </div>
 
-          <GoogleSignInButton />
+            <GoogleSignInButton />
+          </form>
 
-          <p className="text-center text-sm text-zinc-500 dark:text-zinc-400">
+          <p className="mt-5 text-center text-sm text-zinc-500 dark:text-zinc-400">
             New here?{" "}
             <Link href="/register" className="font-medium text-accent hover:underline">
               Create an account
             </Link>
           </p>
-        </form>
+        </div>
       </div>
     </div>
   );
