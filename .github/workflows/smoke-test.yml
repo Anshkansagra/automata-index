@@ -1,0 +1,39 @@
+name: Post-deploy smoke test
+
+# Vercel's GitHub integration reports each deployment as a GitHub Deployment
+# and fires `deployment_status` when it finishes — this runs right after a
+# production deploy succeeds, not on every push (a build can succeed while
+# the app itself is broken, which is exactly what this catches).
+on:
+  deployment_status:
+
+jobs:
+  smoke-test:
+    if: >
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment.environment == 'Production'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Homepage serves the paper feed
+        run: |
+          curl -sf --retry 5 --retry-delay 5 --retry-all-errors \
+            "${{ github.event.deployment_status.environment_url }}/" \
+            | grep -q "papers indexed"
+
+      - name: /login serves the login form, not the homepage
+        run: |
+          curl -sf --retry 5 --retry-delay 5 --retry-all-errors \
+            "${{ github.event.deployment_status.environment_url }}/login" \
+            | grep -q "Welcome back"
+
+      - name: /register serves the signup form, not the homepage
+        run: |
+          curl -sf --retry 5 --retry-delay 5 --retry-all-errors \
+            "${{ github.event.deployment_status.environment_url }}/register" \
+            | grep -q "Create Account"
+
+      - name: /about renders
+        run: |
+          curl -sf --retry 5 --retry-delay 5 --retry-all-errors \
+            "${{ github.event.deployment_status.environment_url }}/about" \
+            | grep -q "About Cortexa"

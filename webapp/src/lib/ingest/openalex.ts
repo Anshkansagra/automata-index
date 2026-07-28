@@ -95,8 +95,13 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function fetchPage(page: number, perPage: number, mailto?: string) {
   const params = new URLSearchParams({
-    search: TOPIC_QUERY,
-    filter: `open_access.is_oa:true,primary_location.source.id:!${ARXIV_SOURCE_ID}`,
+    // title_and_abstract.search (rather than the top-level `search` param)
+    // restricts matching to just the title/abstract instead of full text —
+    // the top-level search let through off-topic papers (e.g. a psychology
+    // thesis, a housing-cost accounting paper) whose body text happened to
+    // mention a generic overlap word like "network" or "communication"
+    // somewhere unrelated to our topics.
+    filter: `title_and_abstract.search:${TOPIC_QUERY},open_access.is_oa:true,primary_location.source.id:!${ARXIV_SOURCE_ID}`,
     page: String(page),
     per_page: String(perPage),
     sort: "publication_date:desc",
