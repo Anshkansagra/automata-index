@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { Paper } from "@/lib/types";
 import { SaveButton } from "@/components/SaveButton";
 import { CiteButton } from "@/components/CiteButton";
@@ -24,14 +25,26 @@ export function PaperCard({
           </span>
         ))}
         {paper.published_date && <span>{paper.published_date}</span>}
+        {typeof paper.citation_count === "number" && paper.citation_count > 0 && (
+          <span>Cited by {paper.citation_count}</span>
+        )}
       </div>
 
       <h2 className="mt-2 text-lg font-semibold leading-snug text-zinc-900 dark:text-zinc-50">
-        {paper.title}
+        <Link href={`/paper/${paper.id}`} className="hover:text-accent hover:underline">
+          {paper.title}
+        </Link>
       </h2>
 
       <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">
-        {paper.authors.slice(0, 6).join(", ")}
+        {paper.authors.slice(0, 6).map((author, i, arr) => (
+          <span key={author}>
+            <Link href={`/author/${encodeURIComponent(author)}`} className="hover:text-accent hover:underline">
+              {author}
+            </Link>
+            {i < arr.length - 1 ? ", " : ""}
+          </span>
+        ))}
         {paper.authors.length > 6 ? ", et al." : ""}
       </p>
 

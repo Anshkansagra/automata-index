@@ -44,3 +44,44 @@ export async function getPapers({
 
   return data as Paper[];
 }
+
+export async function getPaperById(id: string): Promise<Paper | null> {
+  const { data, error } = await supabase.from("papers").select("*").eq("id", id).maybeSingle();
+  if (error) {
+    throw new Error(`Failed to load paper: ${error.message}`);
+  }
+  return data as Paper | null;
+}
+
+// "More like this" without any AI/embeddings — papers sharing at least one
+// category, newest first, excluding the paper itself.
+export async function getRelatedPapers(paper: Paper, limit = 6): Promise<Paper[]> {
+  if (paper.categories.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from("papers")
+    .select("*")
+    .overlaps("categories", paper.categories)
+    .neq("id", paper.id)
+    .order("published_date", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(`Failed to load related papers: ${error.message}`);
+  }
+  return data as Paper[];
+}
+
+// Exact-ish author match — case-insensitive equality against any element of
+// the authors array (unlike full-text search, this must not fuzzy-match
+// unrelated authors whose name happens to share a word).
+export async function getPapersByAuthor(name: string, limit = 50): Promise<Paper[]> {
+  const { data, error } = await supabase.rpc("papers_by_author", {
+    author_name: name,
+    result_limit: limit,
+  });
+  if (error) {
+    throw new Error(`Failed to load author's papers: ${error.message}`);
+  }
+  return data as Paper[];
+}

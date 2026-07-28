@@ -52,6 +52,7 @@ function mapResult(result: CoreResult): Omit<Paper, "id" | "created_at"> | null 
     landing_page_url: `https://core.ac.uk/works/${result.id}`,
     is_open_access: true,
     tldr: null,
+    citation_count: null,
   };
 }
 

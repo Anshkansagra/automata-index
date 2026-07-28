@@ -14,4 +14,5 @@ export type Paper = {
   is_open_access: boolean;
   tldr: string | null;
   created_at: string;
+  citation_count: number | null;
 };

@@ -23,6 +23,7 @@ export type OpenAlexWork = {
   title: string | null;
   display_name: string | null;
   publication_date: string | null;
+  cited_by_count?: number;
   authorships?: { author?: { display_name?: string } }[];
   abstract_inverted_index?: Record<string, number[]>;
   primary_location?: {
@@ -85,6 +86,7 @@ export function mapWork(work: OpenAlexWork): Omit<Paper, "id" | "created_at"> | 
     landing_page_url: landingPageUrl,
     is_open_access: true,
     tldr: null,
+    citation_count: typeof work.cited_by_count === "number" ? work.cited_by_count : null,
   };
 }
 

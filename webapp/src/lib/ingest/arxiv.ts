@@ -47,6 +47,7 @@ function mapEntry(entry: ArxivEntry): Omit<Paper, "id" | "created_at"> {
     landing_page_url: `https://arxiv.org/abs/${arxivId}`,
     is_open_access: true,
     tldr: null,
+    citation_count: null,
   };
 }
 

@@ -50,6 +50,7 @@ type CrossrefItem = {
   publisher?: string;
   license?: { URL: string }[];
   link?: { URL: string }[];
+  "is-referenced-by-count"?: number;
 };
 
 function stripJatsTags(text: string): string {
@@ -90,6 +91,8 @@ function mapItem(
     landing_page_url: `https://doi.org/${item.DOI}`,
     is_open_access: true,
     tldr: null,
+    citation_count:
+      typeof item["is-referenced-by-count"] === "number" ? item["is-referenced-by-count"] : null,
   };
 }
 
