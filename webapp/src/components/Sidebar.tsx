@@ -24,6 +24,7 @@ export async function Sidebar() {
   return (
     <SidebarClient
       isLoggedIn={!!user}
+      userId={user?.id ?? null}
       name={name}
       email={user?.email ?? ""}
       avatarUrl={avatarUrl}

@@ -22,10 +22,6 @@ type Props = {
   location: string;
   bio: string;
   researchInterests: string[];
-  googleScholarUrl: string;
-  orcidId: string;
-  researchgateUrl: string;
-  websiteUrl: string;
   twitterUrl: string;
 };
 
@@ -88,10 +84,6 @@ export function ProfileForm({
   location,
   bio,
   researchInterests,
-  googleScholarUrl,
-  orcidId,
-  researchgateUrl,
-  websiteUrl,
   twitterUrl,
 }: Props) {
   const router = useRouter();
@@ -105,10 +97,6 @@ export function ProfileForm({
   const [bioText, setBioText] = useState(bio);
   const [interests, setInterests] = useState(researchInterests);
   const [interestInput, setInterestInput] = useState("");
-  const [scholar, setScholar] = useState(googleScholarUrl);
-  const [orcid, setOrcid] = useState(orcidId);
-  const [researchgate, setResearchgate] = useState(researchgateUrl);
-  const [website, setWebsite] = useState(websiteUrl);
   const [twitter, setTwitter] = useState(twitterUrl);
   const [infoStatus, setInfoStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
@@ -157,10 +145,6 @@ export function ProfileForm({
         location: loc,
         bio: bioText,
         research_interests: interests,
-        google_scholar_url: scholar,
-        orcid_id: orcid,
-        researchgate_url: researchgate,
-        website_url: website,
         twitter_url: twitter,
       },
     });
@@ -360,45 +344,6 @@ export function ProfileForm({
                 className="min-w-[8rem] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
               />
             </div>
-          </div>
-          <div>
-            <label className={labelClass()}>Google Scholar URL</label>
-            <input
-              type="url"
-              value={scholar}
-              onChange={(e) => setScholar(e.target.value)}
-              placeholder="https://scholar.google.com/citations?user=…"
-              className={inputClass()}
-            />
-          </div>
-          <div>
-            <label className={labelClass()}>ORCID iD</label>
-            <input
-              value={orcid}
-              onChange={(e) => setOrcid(e.target.value)}
-              placeholder="0000-0000-0000-0000"
-              className={inputClass()}
-            />
-          </div>
-          <div>
-            <label className={labelClass()}>ResearchGate URL</label>
-            <input
-              type="url"
-              value={researchgate}
-              onChange={(e) => setResearchgate(e.target.value)}
-              placeholder="https://www.researchgate.net/profile/…"
-              className={inputClass()}
-            />
-          </div>
-          <div>
-            <label className={labelClass()}>Personal website</label>
-            <input
-              type="url"
-              value={website}
-              onChange={(e) => setWebsite(e.target.value)}
-              placeholder="https://…"
-              className={inputClass()}
-            />
           </div>
           <div>
             <label className={labelClass()}>X / Twitter URL</label>

@@ -49,10 +49,6 @@ export default async function ProfilePage() {
           location={(user.user_metadata?.location as string) ?? ""}
           bio={(user.user_metadata?.bio as string) ?? ""}
           researchInterests={(user.user_metadata?.research_interests as string[]) ?? []}
-          googleScholarUrl={(user.user_metadata?.google_scholar_url as string) ?? ""}
-          orcidId={(user.user_metadata?.orcid_id as string) ?? ""}
-          researchgateUrl={(user.user_metadata?.researchgate_url as string) ?? ""}
-          websiteUrl={(user.user_metadata?.website_url as string) ?? ""}
           twitterUrl={(user.user_metadata?.twitter_url as string) ?? ""}
         />
       </div>

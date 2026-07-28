@@ -5,9 +5,12 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { SignOutButton } from "@/components/SignOutButton";
 import { Avatar } from "@/components/Avatar";
+import { createClient } from "@/lib/supabase/client";
+import { deleteSearchHistory } from "@/lib/searchHistory";
 
 type Props = {
   isLoggedIn: boolean;
+  userId: string | null;
   name: string;
   email: string;
   avatarUrl: string | null;
@@ -68,6 +71,13 @@ function MessageIcon() {
   return (
     <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+function XIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2">
+      <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
     </svg>
   );
 }
@@ -138,6 +148,7 @@ function MiniThemeToggle() {
 
 export function SidebarClient({
   isLoggedIn,
+  userId,
   name,
   email,
   avatarUrl,
@@ -146,13 +157,25 @@ export function SidebarClient({
   savedCount,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [searches, setSearches] = useState(recentSearches);
   const router = useRouter();
   const pathname = usePathname();
   const links = isLoggedIn ? LOGGED_IN_LINKS : LOGGED_OUT_LINKS;
 
+  useEffect(() => {
+    setSearches(recentSearches);
+  }, [recentSearches]);
+
   function searchFor(term: string) {
     setOpen(false);
     router.push(`/?q=${encodeURIComponent(term)}#browse`);
+  }
+
+  function removeSearch(term: string) {
+    setSearches((prev) => prev.filter((t) => t !== term));
+    if (!userId) return;
+    const supabase = createClient();
+    deleteSearchHistory(supabase, userId, term);
   }
 
   // "/" jumps to search, like most professional apps — ignored while the
@@ -270,21 +293,34 @@ export function SidebarClient({
           })}
         </nav>
 
-        {isLoggedIn && recentSearches.length > 0 && (
+        {isLoggedIn && searches.length > 0 && (
           <div className="mt-5">
             <p className="mb-1.5 flex items-center gap-1.5 px-1 text-xs font-semibold uppercase tracking-wide text-zinc-400 dark:text-zinc-500">
               <ClockIcon /> Recent searches
             </p>
             <div className="flex flex-col gap-0.5">
-              {recentSearches.map((term) => (
-                <button
+              {searches.map((term) => (
+                <div
                   key={term}
-                  onClick={() => searchFor(term)}
-                  className="truncate rounded-md px-3 py-1.5 text-left text-sm text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-50"
-                  title={term}
+                  className="flex items-center rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-900"
                 >
-                  {term}
-                </button>
+                  <button
+                    onClick={() => searchFor(term)}
+                    className="min-w-0 flex-1 truncate px-3 py-1.5 text-left text-sm text-zinc-600 dark:text-zinc-400"
+                    title={term}
+                  >
+                    {term}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => removeSearch(term)}
+                    aria-label={`Remove "${term}" from recent searches`}
+                    title="Remove"
+                    className="mr-1.5 shrink-0 rounded p-1 text-zinc-300 hover:bg-zinc-200 hover:text-zinc-600 dark:text-zinc-600 dark:hover:bg-zinc-800 dark:hover:text-zinc-300"
+                  >
+                    <XIcon />
+                  </button>
+                </div>
               ))}
             </div>
           </div>
