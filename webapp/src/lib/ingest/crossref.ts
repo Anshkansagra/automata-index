@@ -27,6 +27,11 @@ type CrossrefProfile = {
 const PROFILES: CrossrefProfile[] = [
   { name: "MDPI", prefixFilter: "10.3390", requireCcLicense: false },
   { name: "IEEE (open access)", containerTitle: "IEEE Access", requireCcLicense: true },
+  // IEEE's own DOI prefix (10.1109) covers ALL IEEE journals/conferences,
+  // not just IEEE Access — requireCcLicense is what actually does the legal
+  // work here, so this also correctly picks up individually-open-access
+  // articles published in otherwise-paywalled IEEE Transactions journals.
+  { name: "IEEE (any journal, CC-verified)", prefixFilter: "10.1109", requireCcLicense: true },
   // No publisher restriction at all — requireCcLicense is the only gate.
   // This is what actually captures Springer, Wiley, Elsevier, PLOS,
   // Frontiers, Hindawi, etc.: whichever publisher, an article only survives
