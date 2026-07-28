@@ -1,10 +1,7 @@
 import type { Paper } from "@/lib/types";
 import { SaveButton } from "@/components/SaveButton";
-
-function truncate(text: string, max: number) {
-  if (text.length <= max) return text;
-  return text.slice(0, max).trimEnd() + "…";
-}
+import { CiteButton } from "@/components/CiteButton";
+import { AbstractText } from "@/components/AbstractText";
 
 export function PaperCard({
   paper,
@@ -16,7 +13,7 @@ export function PaperCard({
   isSaved?: boolean;
 }) {
   return (
-    <article className="rounded-lg border border-zinc-200 p-5 transition-colors hover:border-accent/40 dark:border-zinc-800">
+    <article className="rounded-lg border border-zinc-200 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-lg dark:border-zinc-800 dark:hover:shadow-black/40">
       <div className="flex flex-wrap items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
         <span className="rounded-full bg-accent-soft px-2 py-0.5 font-medium uppercase tracking-wide text-accent">
           {paper.source}
@@ -44,11 +41,7 @@ export function PaperCard({
         </p>
       )}
 
-      {paper.abstract && (
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          {truncate(paper.abstract, 280)}
-        </p>
-      )}
+      {paper.abstract && <AbstractText text={paper.abstract} />}
 
       <div className="mt-3 flex gap-3 text-sm">
         {paper.pdf_url && (
@@ -69,6 +62,7 @@ export function PaperCard({
         >
           Source page
         </a>
+        <CiteButton paper={paper} />
         {isLoggedIn && <SaveButton paperId={paper.id} initialSaved={isSaved} />}
       </div>
     </article>

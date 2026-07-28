@@ -21,6 +21,12 @@ type Props = {
   githubUrl: string;
   location: string;
   bio: string;
+  researchInterests: string[];
+  googleScholarUrl: string;
+  orcidId: string;
+  researchgateUrl: string;
+  websiteUrl: string;
+  twitterUrl: string;
 };
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -81,6 +87,12 @@ export function ProfileForm({
   githubUrl,
   location,
   bio,
+  researchInterests,
+  googleScholarUrl,
+  orcidId,
+  researchgateUrl,
+  websiteUrl,
+  twitterUrl,
 }: Props) {
   const router = useRouter();
   const [name, setName] = useState(fullName);
@@ -91,7 +103,28 @@ export function ProfileForm({
   const [github, setGithub] = useState(githubUrl);
   const [loc, setLoc] = useState(location);
   const [bioText, setBioText] = useState(bio);
+  const [interests, setInterests] = useState(researchInterests);
+  const [interestInput, setInterestInput] = useState("");
+  const [scholar, setScholar] = useState(googleScholarUrl);
+  const [orcid, setOrcid] = useState(orcidId);
+  const [researchgate, setResearchgate] = useState(researchgateUrl);
+  const [website, setWebsite] = useState(websiteUrl);
+  const [twitter, setTwitter] = useState(twitterUrl);
   const [infoStatus, setInfoStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+
+  function addInterest(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== "Enter" && e.key !== ",") return;
+    e.preventDefault();
+    const value = interestInput.trim();
+    if (value && !interests.includes(value)) {
+      setInterests([...interests, value]);
+    }
+    setInterestInput("");
+  }
+
+  function removeInterest(value: string) {
+    setInterests(interests.filter((i) => i !== value));
+  }
 
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState(avatarUrl);
   const [avatarStatus, setAvatarStatus] = useState<"idle" | "uploading" | "error">("idle");
@@ -123,6 +156,12 @@ export function ProfileForm({
         github_url: github,
         location: loc,
         bio: bioText,
+        research_interests: interests,
+        google_scholar_url: scholar,
+        orcid_id: orcid,
+        researchgate_url: researchgate,
+        website_url: website,
+        twitter_url: twitter,
       },
     });
     setInfoStatus(error ? "error" : "saved");
@@ -290,7 +329,84 @@ export function ProfileForm({
               value={bioText}
               onChange={(e) => setBioText(e.target.value)}
               rows={3}
-              placeholder="Research interests, what you're working on…"
+              placeholder="What you're working on…"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>Research interests</label>
+            <div className="flex flex-wrap gap-2 rounded-md border border-zinc-300 p-2 dark:border-zinc-700">
+              {interests.map((interest) => (
+                <span
+                  key={interest}
+                  className="flex items-center gap-1 rounded-full bg-accent-soft px-2.5 py-1 text-xs font-medium text-accent"
+                >
+                  {interest}
+                  <button
+                    type="button"
+                    onClick={() => removeInterest(interest)}
+                    aria-label={`Remove ${interest}`}
+                    className="hover:opacity-70"
+                  >
+                    ×
+                  </button>
+                </span>
+              ))}
+              <input
+                value={interestInput}
+                onChange={(e) => setInterestInput(e.target.value)}
+                onKeyDown={addInterest}
+                placeholder={interests.length === 0 ? "e.g. Robotics, press Enter" : "Add another…"}
+                className="min-w-[8rem] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
+              />
+            </div>
+          </div>
+          <div>
+            <label className={labelClass()}>Google Scholar URL</label>
+            <input
+              type="url"
+              value={scholar}
+              onChange={(e) => setScholar(e.target.value)}
+              placeholder="https://scholar.google.com/citations?user=…"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>ORCID iD</label>
+            <input
+              value={orcid}
+              onChange={(e) => setOrcid(e.target.value)}
+              placeholder="0000-0000-0000-0000"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>ResearchGate URL</label>
+            <input
+              type="url"
+              value={researchgate}
+              onChange={(e) => setResearchgate(e.target.value)}
+              placeholder="https://www.researchgate.net/profile/…"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>Personal website</label>
+            <input
+              type="url"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              placeholder="https://…"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>X / Twitter URL</label>
+            <input
+              type="url"
+              value={twitter}
+              onChange={(e) => setTwitter(e.target.value)}
+              placeholder="https://x.com/…"
               className={inputClass()}
             />
           </div>

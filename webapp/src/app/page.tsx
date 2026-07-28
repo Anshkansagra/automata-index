@@ -8,6 +8,7 @@ import { HeroSlideshow } from "@/components/HeroSlideshow";
 import { TopicExplorer } from "@/components/TopicExplorer";
 import { SaveSearchButton } from "@/components/SaveSearchButton";
 import { logSearch } from "@/lib/searchHistory";
+import { NeuralNetwork } from "@/components/illustrations";
 
 export default async function Home({
   searchParams,
@@ -33,36 +34,43 @@ export default async function Home({
     <div className="bg-zinc-50 dark:bg-black">
       <HeroSlideshow />
 
-      <main id="browse" className="mx-auto flex max-w-3xl flex-col gap-6 px-4 py-16 sm:px-8">
-        <SearchBar defaultValue={q} />
-        {q.trim() && (
-          <SaveSearchButton query={q} source={source ?? null} isLoggedIn={!!user} />
-        )}
-        <FilterPills q={q} activeSource={source ?? null} />
+      <main id="browse" className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-16 sm:px-8">
+        <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
+          <SearchBar defaultValue={q} />
+          {q.trim() && (
+            <SaveSearchButton query={q} source={source ?? null} isLoggedIn={!!user} />
+          )}
+          <FilterPills q={q} activeSource={source ?? null} />
 
-        <div>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-            Explore by topic
-          </h2>
-          <TopicExplorer />
+          <div>
+            <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+              Explore by topic
+            </h2>
+            <TopicExplorer />
+          </div>
         </div>
 
-        <div className="flex flex-col gap-4">
-          {papers.length === 0 ? (
-            <p className="py-12 text-center text-sm text-zinc-500 dark:text-zinc-400">
-              No papers found. Try a different search term.
+        {papers.length === 0 ? (
+          <div className="flex flex-col items-center gap-4 py-16 text-center">
+            <div className="h-40 w-40 text-zinc-300 dark:text-zinc-700">
+              <NeuralNetwork />
+            </div>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              No papers found. Try a different search term or clear your filters.
             </p>
-          ) : (
-            papers.map((paper) => (
+          </div>
+        ) : (
+          <div className="papers-columns">
+            {papers.map((paper) => (
               <PaperCard
                 key={paper.id}
                 paper={paper}
                 isLoggedIn={!!user}
                 isSaved={savedIds.has(paper.id)}
               />
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );

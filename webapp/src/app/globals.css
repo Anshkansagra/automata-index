@@ -36,3 +36,15 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Pinterest-style masonry for paper card lists — CSS columns auto-flow
+   variable-height cards without JS, each card kept intact via break-inside. */
+.papers-columns {
+  column-width: 24rem;
+  column-gap: 1rem;
+}
+
+.papers-columns > * {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+}

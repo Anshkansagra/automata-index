@@ -62,7 +62,7 @@ export default async function DashboardPage() {
   const name = (user.user_metadata?.full_name as string | undefined) || user.email;
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-16 sm:px-8">
+    <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
       <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
         Welcome back, {name}
       </h1>
@@ -109,7 +109,7 @@ export default async function DashboardPage() {
         </div>
       </div>
 
-      <div className="mt-4 flex flex-col gap-4">
+      <div className="papers-columns mt-4">
         {recentPapers.map((paper) => (
           <PaperCard
             key={paper.id}
