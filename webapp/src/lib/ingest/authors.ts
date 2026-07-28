@@ -7,18 +7,22 @@ const OPENALEX_WORKS_URL = "https://api.openalex.org/works";
 // Researchers whose open-access work should always be indexed, even when it
 // falls outside the broad topic-keyword queries the other ingest pipelines
 // use — requested directly rather than discovered via keyword search.
-const TARGET_AUTHORS = ["Chang Yoong Choon", "Sagar Kavaiya", "Hiren Mevada"];
+const TARGET_AUTHORS = ["Chang Yoong Choon", "Sagar Kavaiya", "Hiren Mewada"];
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-type OpenAlexAuthor = { id: string };
+type OpenAlexAuthor = { id: string; display_name: string; works_count: number };
 
 function extractId(fullId: string): string {
   return fullId.split("/").pop() ?? fullId;
 }
 
-async function findAuthorId(name: string, mailto?: string): Promise<string | null> {
-  const params = new URLSearchParams({ search: name, per_page: "1" });
+// OpenAlex sometimes splits one real person into several unmerged author
+// profiles (e.g. after an institution change) — matching only the top result
+// silently drops whichever works landed on the other profile(s). Pull every
+// profile whose display name matches exactly (case-insensitive) instead.
+async function findAuthorIds(name: string, mailto?: string): Promise<string[]> {
+  const params = new URLSearchParams({ search: name, per_page: "10" });
   if (mailto) params.set("mailto", mailto);
 
   const res = await fetch(`${OPENALEX_AUTHORS_URL}?${params.toString()}`);
@@ -26,8 +30,12 @@ async function findAuthorId(name: string, mailto?: string): Promise<string | nul
     throw new Error(`OpenAlex author lookup failed for "${name}": ${res.status} ${res.statusText}`);
   }
   const json = await res.json();
-  const [top] = (json.results ?? []) as OpenAlexAuthor[];
-  return top ? extractId(top.id) : null;
+  const results = (json.results ?? []) as OpenAlexAuthor[];
+  const normalized = name.toLowerCase();
+
+  return results
+    .filter((a) => a.display_name?.toLowerCase() === normalized && a.works_count > 0)
+    .map((a) => extractId(a.id));
 }
 
 async function fetchWorksByAuthor(authorId: string, page: number, perPage: number, mailto?: string) {
@@ -52,8 +60,8 @@ export async function ingestAuthors({ pages = 2, perPage = 100 } = {}) {
   const results: { author: string; found: boolean; fetched: number; upserted: number }[] = [];
 
   for (const name of TARGET_AUTHORS) {
-    const authorId = await findAuthorId(name, mailto);
-    if (!authorId) {
+    const authorIds = await findAuthorIds(name, mailto);
+    if (authorIds.length === 0) {
       results.push({ author: name, found: false, fetched: 0, upserted: 0 });
       continue;
     }
@@ -61,38 +69,42 @@ export async function ingestAuthors({ pages = 2, perPage = 100 } = {}) {
     let fetched = 0;
     let upserted = 0;
 
-    for (let page = 1; page <= pages; page++) {
-      const works = await fetchWorksByAuthor(authorId, page, perPage, mailto);
-      if (works.length === 0) break;
-      fetched += works.length;
+    for (const authorId of authorIds) {
+      for (let page = 1; page <= pages; page++) {
+        const works = await fetchWorksByAuthor(authorId, page, perPage, mailto);
+        if (works.length === 0) break;
+        fetched += works.length;
 
-      const candidates = works.map(mapWork).filter((r): r is NonNullable<typeof r> => r !== null);
+        const candidates = works.map(mapWork).filter((r): r is NonNullable<typeof r> => r !== null);
 
-      // Skip anything whose DOI is already indexed from another source
-      // (arXiv/CrossRef/CORE) to avoid a papers_doi_unique conflict.
-      const dois = candidates.map((r) => r.doi).filter((d): d is string => Boolean(d));
-      let existingDois = new Set<string>();
-      if (dois.length > 0) {
-        const { data: existing } = await supabaseAdmin.from("papers").select("doi").in("doi", dois);
-        existingDois = new Set((existing ?? []).map((r) => r.doi as string));
-      }
-      const rows = candidates.filter((row) => !row.doi || !existingDois.has(row.doi));
-
-      if (rows.length > 0) {
-        const { error, count } = await supabaseAdmin
-          .from("papers")
-          .upsert(rows, { onConflict: "source,source_id", count: "exact" });
-        if (error) {
-          throw new Error(`Supabase upsert failed for "${name}": ${error.message}`);
+        // Skip anything whose DOI is already indexed from another source
+        // (arXiv/CrossRef/CORE, or an earlier profile for the same person)
+        // to avoid a papers_doi_unique conflict.
+        const dois = candidates.map((r) => r.doi).filter((d): d is string => Boolean(d));
+        let existingDois = new Set<string>();
+        if (dois.length > 0) {
+          const { data: existing } = await supabaseAdmin.from("papers").select("doi").in("doi", dois);
+          existingDois = new Set((existing ?? []).map((r) => r.doi as string));
         }
-        upserted += count ?? rows.length;
+        const rows = candidates.filter((row) => !row.doi || !existingDois.has(row.doi));
+
+        if (rows.length > 0) {
+          const { error, count } = await supabaseAdmin
+            .from("papers")
+            .upsert(rows, { onConflict: "source,source_id", count: "exact" });
+          if (error) {
+            throw new Error(`Supabase upsert failed for "${name}": ${error.message}`);
+          }
+          upserted += count ?? rows.length;
+        }
+
+        if (page < pages) await sleep(1000);
       }
 
-      if (page < pages) await sleep(1000);
+      await sleep(500);
     }
 
     results.push({ author: name, found: true, fetched, upserted });
-    await sleep(500);
   }
 
   return { results };
