@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { supabasePublic } from "@/lib/supabase/public";
 import { getRecentSearchHistory } from "@/lib/searchHistory";
 import { SidebarClient } from "@/components/SidebarClient";
 
@@ -8,7 +9,13 @@ export async function Sidebar() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const recentSearches = user ? await getRecentSearchHistory(supabase, user.id) : [];
+  const [recentSearches, { count: totalPapers }, savedCountResult] = await Promise.all([
+    user ? getRecentSearchHistory(supabase, user.id) : Promise.resolve([]),
+    supabasePublic.from("papers").select("id", { count: "exact", head: true }),
+    user
+      ? supabase.from("saved_papers").select("id", { count: "exact", head: true }).eq("user_id", user.id)
+      : Promise.resolve({ count: 0 }),
+  ]);
 
   const name = (user?.user_metadata?.full_name as string) || user?.email || "";
   const avatarUrl =
@@ -21,6 +28,8 @@ export async function Sidebar() {
       email={user?.email ?? ""}
       avatarUrl={avatarUrl}
       recentSearches={recentSearches}
+      totalPapers={totalPapers ?? 0}
+      savedCount={savedCountResult.count ?? 0}
     />
   );
 }

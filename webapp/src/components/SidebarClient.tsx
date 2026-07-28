@@ -12,6 +12,8 @@ type Props = {
   email: string;
   avatarUrl: string | null;
   recentSearches: string[];
+  totalPapers: number;
+  savedCount: number;
 };
 
 function HomeIcon() {
@@ -134,7 +136,15 @@ function MiniThemeToggle() {
   );
 }
 
-export function SidebarClient({ isLoggedIn, name, email, avatarUrl, recentSearches }: Props) {
+export function SidebarClient({
+  isLoggedIn,
+  name,
+  email,
+  avatarUrl,
+  recentSearches,
+  totalPapers,
+  savedCount,
+}: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
@@ -144,6 +154,24 @@ export function SidebarClient({ isLoggedIn, name, email, avatarUrl, recentSearch
     setOpen(false);
     router.push(`/?q=${encodeURIComponent(term)}#browse`);
   }
+
+  // "/" jumps to search, like most professional apps — ignored while the
+  // user is already typing somewhere so it doesn't hijack normal typing.
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key !== "/") return;
+      const target = e.target as HTMLElement;
+      const isTyping = ["INPUT", "TEXTAREA"].includes(target.tagName) || target.isContentEditable;
+      if (isTyping) return;
+      e.preventDefault();
+      router.push("/#browse");
+      setTimeout(() => {
+        document.querySelector<HTMLInputElement>('input[name="q"]')?.focus();
+      }, 100);
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [router]);
 
   return (
     <>
@@ -185,11 +213,14 @@ export function SidebarClient({ isLoggedIn, name, email, avatarUrl, recentSearch
       >
         <Link
           href="/"
-          className="mb-4 hidden items-center gap-2 text-sm font-semibold tracking-wide text-zinc-900 md:flex dark:text-zinc-50"
+          className="hidden items-center gap-2 text-sm font-semibold tracking-wide text-zinc-900 md:flex dark:text-zinc-50"
         >
           <span className="inline-block h-2 w-2 rounded-full bg-accent" />
           CORTEXA
         </Link>
+        <p className="mb-4 hidden pl-4 text-xs text-zinc-400 md:block dark:text-zinc-500">
+          {totalPapers.toLocaleString()} papers indexed
+        </p>
 
         {isLoggedIn && (
           <Link
@@ -225,6 +256,15 @@ export function SidebarClient({ isLoggedIn, name, email, avatarUrl, recentSearch
               >
                 <link.Icon />
                 {link.label}
+                {link.label === "Saved" && savedCount > 0 && (
+                  <span
+                    className={`ml-auto rounded-full px-1.5 py-0.5 text-xs font-semibold ${
+                      isActive ? "bg-white/20 text-white" : "bg-accent-soft text-accent"
+                    }`}
+                  >
+                    {savedCount}
+                  </span>
+                )}
               </Link>
             );
           })}
