@@ -50,26 +50,39 @@ export async function getPapers({
   }
 
   // No search term: plain browse.
-  let query = supabase.from("papers").select("*").limit(limit);
+  function buildQuery(useCitationSort: boolean) {
+    let q = supabase.from("papers").select("*").limit(limit);
 
-  if (sort === "cited") {
-    query = query.order("citation_count", { ascending: false, nullsFirst: false });
-  } else {
-    query = query.order("published_date", { ascending: false, nullsFirst: false });
+    q =
+      useCitationSort
+        ? q.order("citation_count", { ascending: false, nullsFirst: false })
+        : q.order("published_date", { ascending: false, nullsFirst: false });
+
+    if (selectedSources.length > 0) {
+      q = q.in("source", selectedSources);
+    }
+    if (yearFrom) {
+      q = q.gte("published_date", `${yearFrom}-01-01`);
+    }
+    if (yearTo) {
+      q = q.lte("published_date", `${yearTo}-12-31`);
+    }
+    return q;
   }
 
-  if (selectedSources.length > 0) {
-    query = query.in("source", selectedSources);
-  }
-  if (yearFrom) {
-    query = query.gte("published_date", `${yearFrom}-01-01`);
-  }
-  if (yearTo) {
-    query = query.lte("published_date", `${yearTo}-12-31`);
-  }
+  const { data, error } = await buildQuery(sort === "cited");
 
-  const { data, error } = await query;
+  // "Most Cited" depends on a citation_count column that may not exist yet
+  // on every environment (rolled out via a separate migration) — degrade to
+  // the default newest-first sort instead of taking the whole page down.
   if (error) {
+    if (sort === "cited" && error.code === "42703") {
+      const fallback = await buildQuery(false);
+      if (fallback.error) {
+        throw new Error(`Failed to load papers: ${fallback.error.message}`);
+      }
+      return fallback.data as Paper[];
+    }
     throw new Error(`Failed to load papers: ${error.message}`);
   }
 
