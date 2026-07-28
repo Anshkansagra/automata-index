@@ -1,7 +1,7 @@
 import { XMLParser } from "fast-xml-parser";
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { ARXIV_CATEGORIES } from "@/lib/ingest/categories";
 import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
+import { upsertPapers } from "@/lib/ingest/upsertPapers";
 import type { Paper } from "@/lib/types";
 
 const ARXIV_API_URL = "http://export.arxiv.org/api/query";
@@ -95,16 +95,10 @@ export async function ingestArxiv({ pages = 4, pageSize = 250 } = {}) {
       return true;
     });
 
-    const { error, count } = await supabaseAdmin
-      .from("papers")
-      .upsert(rows, { onConflict: "source,source_id", count: "exact" });
-
-    if (error) {
-      throw new Error(`Supabase upsert failed: ${error.message}`);
-    }
+    const { count } = await upsertPapers(rows);
 
     totalFetched += entries.length;
-    totalUpserted += count ?? rows.length;
+    totalUpserted += count;
 
     if (page < pages - 1) await sleep(3000);
   }

@@ -1,5 +1,5 @@
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
+import { upsertPapers } from "@/lib/ingest/upsertPapers";
 import type { Paper } from "@/lib/types";
 
 const CORE_API_URL = "https://api.core.ac.uk/v3/search/works";
@@ -93,13 +93,7 @@ export async function ingestCore({ limit = 25 } = {}) {
     return { fetched: results.length, upserted: 0 };
   }
 
-  const { error, count } = await supabaseAdmin
-    .from("papers")
-    .upsert(rows, { onConflict: "source,source_id", count: "exact" });
+  const { count } = await upsertPapers(rows);
 
-  if (error) {
-    throw new Error(`Supabase upsert failed: ${error.message}`);
-  }
-
-  return { fetched: results.length, upserted: count ?? rows.length };
+  return { fetched: results.length, upserted: count };
 }

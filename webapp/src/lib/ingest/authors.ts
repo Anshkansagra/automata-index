@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { mapWork, ARXIV_SOURCE_ID, type OpenAlexWork } from "@/lib/ingest/openalex";
+import { upsertPapers } from "@/lib/ingest/upsertPapers";
 
 const OPENALEX_AUTHORS_URL = "https://api.openalex.org/authors";
 const OPENALEX_WORKS_URL = "https://api.openalex.org/works";
@@ -89,13 +90,8 @@ export async function ingestAuthors({ pages = 2, perPage = 100 } = {}) {
         const rows = candidates.filter((row) => !row.doi || !existingDois.has(row.doi));
 
         if (rows.length > 0) {
-          const { error, count } = await supabaseAdmin
-            .from("papers")
-            .upsert(rows, { onConflict: "source,source_id", count: "exact" });
-          if (error) {
-            throw new Error(`Supabase upsert failed for "${name}": ${error.message}`);
-          }
-          upserted += count ?? rows.length;
+          const { count } = await upsertPapers(rows);
+          upserted += count;
         }
 
         if (page < pages) await sleep(1000);

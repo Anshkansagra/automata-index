@@ -1,6 +1,6 @@
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { isLikelyRealPdfUrl } from "@/lib/ingest/pdfUrl";
 import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
+import { upsertPapers } from "@/lib/ingest/upsertPapers";
 import type { Paper } from "@/lib/types";
 
 const CROSSREF_URL = "https://api.crossref.org/works";
@@ -141,14 +141,8 @@ export async function ingestCrossref({ pages = 3, rowsPerPage = 100 } = {}) {
         .filter((r): r is NonNullable<typeof r> => r !== null);
 
       if (rows.length > 0) {
-        const { error, count } = await supabaseAdmin
-          .from("papers")
-          .upsert(rows, { onConflict: "source,source_id", count: "exact" });
-
-        if (error) {
-          throw new Error(`Supabase upsert failed: ${error.message}`);
-        }
-        totalUpserted += count ?? rows.length;
+        const { count } = await upsertPapers(rows);
+        totalUpserted += count;
       }
 
       if (page < pages - 1) await sleep(1000);

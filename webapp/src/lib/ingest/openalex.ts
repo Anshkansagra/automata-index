@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { isLikelyRealPdfUrl } from "@/lib/ingest/pdfUrl";
 import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
+import { upsertPapers } from "@/lib/ingest/upsertPapers";
 import type { Paper } from "@/lib/types";
 
 const OPENALEX_URL = "https://api.openalex.org/works";
@@ -149,13 +150,8 @@ export async function ingestOpenAlex({ pages = 2, perPage = 100 } = {}) {
     const rows = deduped.filter((row) => !row.doi || !existingDois.has(row.doi));
 
     if (rows.length > 0) {
-      const { error, count } = await supabaseAdmin
-        .from("papers")
-        .upsert(rows, { onConflict: "source,source_id", count: "exact" });
-      if (error) {
-        throw new Error(`Supabase upsert failed: ${error.message}`);
-      }
-      totalUpserted += count ?? rows.length;
+      const { count } = await upsertPapers(rows);
+      totalUpserted += count;
     }
 
     if (page < pages) await sleep(1000);

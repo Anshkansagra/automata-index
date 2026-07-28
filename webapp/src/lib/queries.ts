@@ -124,7 +124,12 @@ export async function getPapersByAuthor(name: string, limit = 50): Promise<Paper
     author_name: name,
     result_limit: limit,
   });
+
+  // The papers_by_author() function ships via a separate migration that may
+  // not have landed in every environment yet — degrade to an empty result
+  // (renders the page's existing "no papers found" state) instead of a 500.
   if (error) {
+    if (error.code === "PGRST202") return [];
     throw new Error(`Failed to load author's papers: ${error.message}`);
   }
   return data as Paper[];
