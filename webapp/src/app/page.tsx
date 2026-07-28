@@ -1,9 +1,11 @@
-import { getPapers } from "@/lib/queries";
+import { getPapers, type PaperSort } from "@/lib/queries";
 import { getSavedPaperIdSet } from "@/lib/savedPapers";
 import { createClient } from "@/lib/supabase/server";
 import { PaperCard } from "@/components/PaperCard";
 import { SearchBar } from "@/components/SearchBar";
 import { FilterPills } from "@/components/FilterPills";
+import { SortControl } from "@/components/SortControl";
+import { YearRangeFilter } from "@/components/YearRangeFilter";
 import { HeroSlideshow } from "@/components/HeroSlideshow";
 import { TopicExplorer } from "@/components/TopicExplorer";
 import { SaveSearchButton } from "@/components/SaveSearchButton";
@@ -13,16 +15,27 @@ import { NeuralNetwork } from "@/components/illustrations";
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; source?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    source?: string;
+    sort?: string;
+    yearFrom?: string;
+    yearTo?: string;
+  }>;
 }) {
-  const { q = "", source } = await searchParams;
+  const { q = "", source, sort, yearFrom, yearTo } = await searchParams;
+  const activeSources = source ? source.split(",").map((s) => s.trim()).filter(Boolean) : [];
+  const activeSort: PaperSort = sort === "cited" ? "cited" : "recent";
+  const yearFromNum = yearFrom ? Number(yearFrom) : undefined;
+  const yearToNum = yearTo ? Number(yearTo) : undefined;
+
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const [papers, savedIds] = await Promise.all([
-    getPapers({ q, source }),
+    getPapers({ q, sources: activeSources, sort: activeSort, yearFrom: yearFromNum, yearTo: yearToNum }),
     user ? getSavedPaperIdSet(supabase, user.id) : Promise.resolve(new Set<string>()),
   ]);
 
@@ -40,7 +53,22 @@ export default async function Home({
           {q.trim() && (
             <SaveSearchButton query={q} source={source ?? null} isLoggedIn={!!user} />
           )}
-          <FilterPills q={q} activeSource={source ?? null} />
+          <FilterPills q={q} activeSources={activeSources} extraParams={{ sort, yearFrom, yearTo }} />
+
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <SortControl
+              activeSort={activeSort}
+              isSearching={!!q.trim()}
+              extraParams={{ q, source, yearFrom, yearTo }}
+            />
+            <YearRangeFilter
+              yearFrom={yearFromNum}
+              yearTo={yearToNum}
+              q={q}
+              source={source}
+              sort={sort}
+            />
+          </div>
 
           <div>
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
