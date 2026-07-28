@@ -7,19 +7,38 @@ import { getSavedPaperIdSet } from "@/lib/savedPapers";
 import { PaperCard } from "@/components/PaperCard";
 
 async function getStats() {
-  const [{ count: total }, { count: arxiv }, { count: crossref }, { count: openalex }, { count: core }] =
-    await Promise.all([
-      supabasePublic.from("papers").select("id", { count: "exact", head: true }),
-      supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "arxiv"),
-      supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "crossref"),
-      supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "openalex"),
-      supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "core"),
-    ]);
+  const [
+    { count: total },
+    { count: arxiv },
+    { count: crossref },
+    { count: mdpi },
+    { count: ieee },
+    { count: openalex },
+    { count: core },
+  ] = await Promise.all([
+    supabasePublic.from("papers").select("id", { count: "exact", head: true }),
+    supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "arxiv"),
+    supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "crossref"),
+    supabasePublic
+      .from("papers")
+      .select("id", { count: "exact", head: true })
+      .eq("source", "crossref")
+      .or("publisher.ilike.%MDPI%,publisher.ilike.%Multidisciplinary%"),
+    supabasePublic
+      .from("papers")
+      .select("id", { count: "exact", head: true })
+      .eq("source", "crossref")
+      .ilike("publisher", "%Electrical and Electronics%"),
+    supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "openalex"),
+    supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "core"),
+  ]);
 
   return {
     total: total ?? 0,
     arxiv: arxiv ?? 0,
     crossref: crossref ?? 0,
+    mdpi: mdpi ?? 0,
+    ieee: ieee ?? 0,
     openalex: openalex ?? 0,
     core: core ?? 0,
   };
@@ -49,11 +68,12 @@ export default async function DashboardPage() {
       </h1>
       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{user.email}</p>
 
-      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
         {[
           { label: "Total papers indexed", value: stats.total },
           { label: "arXiv", value: stats.arxiv },
-          { label: "MDPI / IEEE (OA)", value: stats.crossref },
+          { label: "MDPI", value: stats.mdpi },
+          { label: "IEEE (OA)", value: stats.ieee },
           { label: "OpenAlex", value: stats.openalex },
           { label: "CORE", value: stats.core },
         ].map((stat) => (

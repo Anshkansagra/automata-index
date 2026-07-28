@@ -1,13 +1,19 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { RoboticGripper } from "@/components/illustrations";
+import { supabasePublic } from "@/lib/supabase/public";
 
 export const metadata: Metadata = {
   title: "About — Cortexa",
   description: "The story and the person behind Cortexa, a free open-access research index for robotics, ML, and AI.",
 };
 
-export default function AboutPage() {
+const LINKEDIN_URL = "https://www.linkedin.com/in/ansh-kansagra";
+
+export default async function AboutPage() {
+  const { count } = await supabasePublic.from("papers").select("id", { count: "exact", head: true });
+  const paperCountLabel = count ? `${Math.floor(count / 1000) * 1000}+`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : "20,000+";
+
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
       <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">About Cortexa</h1>
@@ -20,9 +26,9 @@ export default function AboutPage() {
           open access, no paywalls, no scraped content.
         </p>
         <p>
-          The index is rebuilt daily, currently covers 16,000+ papers across arXiv, CrossRef
-          (MDPI, individually open-access IEEE, and other publishers), and OpenAlex, and keeps
-          growing.
+          The index is rebuilt daily, currently covers {paperCountLabel} papers across arXiv,
+          CrossRef (MDPI, individually open-access IEEE, and other publishers), and OpenAlex, and
+          keeps growing.
         </p>
       </div>
 
@@ -46,6 +52,17 @@ export default function AboutPage() {
               If you&apos;re working on something in robotics, ML, or AI — research, a product,
               or hiring — I&apos;d like to hear from you.
             </p>
+            <a
+              href={LINKEDIN_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-accent hover:underline"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
+                <path d="M20.45 20.45h-3.55v-5.57c0-1.33-.02-3.04-1.85-3.04-1.86 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45z" />
+              </svg>
+              Connect on LinkedIn
+            </a>
           </div>
         </div>
       </div>

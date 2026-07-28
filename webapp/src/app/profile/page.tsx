@@ -46,6 +46,8 @@ export default async function ProfilePage() {
           profession={(user.user_metadata?.profession as string) ?? ""}
           linkedinUrl={(user.user_metadata?.linkedin_url as string) ?? ""}
           githubUrl={(user.user_metadata?.github_url as string) ?? ""}
+          location={(user.user_metadata?.location as string) ?? ""}
+          bio={(user.user_metadata?.bio as string) ?? ""}
         />
       </div>
     </div>

@@ -62,6 +62,13 @@ function ClockIcon() {
     </svg>
   );
 }
+function MessageIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 const LOGGED_IN_LINKS = [
   { href: "/", label: "Home", Icon: HomeIcon },
@@ -69,6 +76,7 @@ const LOGGED_IN_LINKS = [
   { href: "/saved", label: "Saved", Icon: BookmarkIcon },
   { href: "/dashboard", label: "Dashboard", Icon: GridIcon },
   { href: "/profile", label: "Profile", Icon: UserIcon },
+  { href: "/feedback", label: "Feedback", Icon: MessageIcon },
 ];
 
 const LOGGED_OUT_LINKS = [

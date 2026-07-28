@@ -19,6 +19,8 @@ type Props = {
   profession: string;
   linkedinUrl: string;
   githubUrl: string;
+  location: string;
+  bio: string;
 };
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
@@ -77,6 +79,8 @@ export function ProfileForm({
   profession,
   linkedinUrl,
   githubUrl,
+  location,
+  bio,
 }: Props) {
   const router = useRouter();
   const [name, setName] = useState(fullName);
@@ -85,6 +89,8 @@ export function ProfileForm({
   const [prof, setProf] = useState(profession);
   const [linkedin, setLinkedin] = useState(linkedinUrl);
   const [github, setGithub] = useState(githubUrl);
+  const [loc, setLoc] = useState(location);
+  const [bioText, setBioText] = useState(bio);
   const [infoStatus, setInfoStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState(avatarUrl);
@@ -115,6 +121,8 @@ export function ProfileForm({
         profession: prof,
         linkedin_url: linkedin,
         github_url: github,
+        location: loc,
+        bio: bioText,
       },
     });
     setInfoStatus(error ? "error" : "saved");
@@ -264,6 +272,25 @@ export function ProfileForm({
               value={prof}
               onChange={(e) => setProf(e.target.value)}
               placeholder="e.g. Student, Research Engineer"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>Location</label>
+            <input
+              value={loc}
+              onChange={(e) => setLoc(e.target.value)}
+              placeholder="e.g. Ahmedabad, India"
+              className={inputClass()}
+            />
+          </div>
+          <div>
+            <label className={labelClass()}>About you</label>
+            <textarea
+              value={bioText}
+              onChange={(e) => setBioText(e.target.value)}
+              rows={3}
+              placeholder="Research interests, what you're working on…"
               className={inputClass()}
             />
           </div>
