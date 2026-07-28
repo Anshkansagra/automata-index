@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { isLikelyRealPdfUrl } from "@/lib/ingest/pdfUrl";
+import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
 import type { Paper } from "@/lib/types";
 
 const OPENALEX_URL = "https://api.openalex.org/works";
@@ -14,9 +15,9 @@ const TOPIC_QUERY =
 // arXiv's OpenAlex source ID — excluded because we already ingest arXiv
 // directly and comprehensively; this keeps OpenAlex complementary instead
 // of redundant.
-const ARXIV_SOURCE_ID = "S4306400194";
+export const ARXIV_SOURCE_ID = "S4306400194";
 
-type OpenAlexWork = {
+export type OpenAlexWork = {
   id: string;
   doi: string | null;
   title: string | null;
@@ -53,7 +54,7 @@ function extractWorkId(fullId: string): string {
 // PDF. open_access.oa_url (sourced from Unpaywall) is far more trustworthy,
 // so that's the only field we use; anything that still looks like a
 // publisher API call gets rejected outright rather than shown as "free PDF".
-function mapWork(work: OpenAlexWork): Omit<Paper, "id" | "created_at"> | null {
+export function mapWork(work: OpenAlexWork): Omit<Paper, "id" | "created_at"> | null {
   const title = work.title || work.display_name;
   if (!title) return null;
 
@@ -72,7 +73,7 @@ function mapWork(work: OpenAlexWork): Omit<Paper, "id" | "created_at"> | null {
       .map((a) => a.author?.display_name)
       .filter((name): name is string => Boolean(name)),
     abstract: reconstructAbstract(work.abstract_inverted_index),
-    published_date: work.publication_date ?? null,
+    published_date: sanitizeDate(work.publication_date),
     categories: work.primary_location?.source?.display_name
       ? [work.primary_location.source.display_name]
       : [],

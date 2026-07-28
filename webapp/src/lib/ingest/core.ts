@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
 import type { Paper } from "@/lib/types";
 
 const CORE_API_URL = "https://api.core.ac.uk/v3/search/works";
@@ -32,9 +33,10 @@ function mapResult(result: CoreResult): Omit<Paper, "id" | "created_at"> | null 
   const pdfUrl = result.downloadUrl || result.sourceFulltextUrls?.[0] || null;
   if (!pdfUrl) return null;
 
-  const publishedDate =
+  const publishedDate = sanitizeDate(
     (result.publishedDate?.slice(0, 10) || null) ??
-    (result.yearPublished ? `${result.yearPublished}-01-01` : null);
+      (result.yearPublished ? `${result.yearPublished}-01-01` : null)
+  );
 
   return {
     source: "core",

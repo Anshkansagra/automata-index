@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { ingestCrossref } from "@/lib/ingest/crossref";
+import { ingestAuthors } from "@/lib/ingest/authors";
 import { isAuthorizedIngestRequest } from "@/lib/ingest/auth";
 
 export const dynamic = "force-dynamic";
@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const result = await ingestCrossref({ pages: 2, rowsPerPage: 100 });
+    const result = await ingestAuthors({ pages: 2, perPage: 100 });
     return NextResponse.json(result);
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";

@@ -1,6 +1,7 @@
 import { XMLParser } from "fast-xml-parser";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { ARXIV_CATEGORIES } from "@/lib/ingest/categories";
+import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
 import type { Paper } from "@/lib/types";
 
 const ARXIV_API_URL = "http://export.arxiv.org/api/query";
@@ -39,7 +40,7 @@ function mapEntry(entry: ArxivEntry): Omit<Paper, "id" | "created_at"> {
     title: entry.title.replace(/\s+/g, " ").trim(),
     authors: toArray(entry.author).map((a) => a.name),
     abstract: entry.summary.replace(/\s+/g, " ").trim(),
-    published_date: entry.published.slice(0, 10),
+    published_date: sanitizeDate(entry.published.slice(0, 10)),
     categories: toArray(entry.category).map((c) => c["@_term"]),
     publisher: "arXiv",
     pdf_url: pdfLink ?? `https://arxiv.org/pdf/${arxivId}`,

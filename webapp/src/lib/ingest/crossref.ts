@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { isLikelyRealPdfUrl } from "@/lib/ingest/pdfUrl";
+import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
 import type { Paper } from "@/lib/types";
 
 const CROSSREF_URL = "https://api.crossref.org/works";
@@ -82,7 +83,7 @@ function mapItem(
       .map((a) => [a.given, a.family].filter(Boolean).join(" "))
       .filter(Boolean),
     abstract: item.abstract ? stripJatsTags(item.abstract) : null,
-    published_date: datePartsToIso(item.published?.["date-parts"]),
+    published_date: sanitizeDate(datePartsToIso(item.published?.["date-parts"])),
     categories: item["container-title"]?.[0] ? [item["container-title"][0]] : [],
     publisher: item.publisher ?? profile.name,
     pdf_url: item.link?.[0]?.URL && isLikelyRealPdfUrl(item.link[0].URL) ? item.link[0].URL : null,
