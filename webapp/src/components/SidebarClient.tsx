@@ -158,13 +158,20 @@ export function SidebarClient({
 }: Props) {
   const [open, setOpen] = useState(false);
   const [searches, setSearches] = useState(recentSearches);
+  const [prevRecentSearches, setPrevRecentSearches] = useState(recentSearches);
   const router = useRouter();
   const pathname = usePathname();
   const links = isLoggedIn ? LOGGED_IN_LINKS : LOGGED_OUT_LINKS;
 
-  useEffect(() => {
+  // The server passes a fresh recentSearches array on every navigation, but
+  // this component's local state persists across soft navigations (needed
+  // for the optimistic delete below) — so re-sync during render rather than
+  // in an effect when the prop actually changes. React's documented pattern
+  // for "adjusting state when a prop changes."
+  if (recentSearches !== prevRecentSearches) {
+    setPrevRecentSearches(recentSearches);
     setSearches(recentSearches);
-  }, [recentSearches]);
+  }
 
   function searchFor(term: string) {
     setOpen(false);
@@ -329,13 +336,15 @@ export function SidebarClient({
         <div className="mt-auto flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
           <div className="flex items-center justify-between">
             <MiniThemeToggle />
-            <Link
-              href="/about"
-              onClick={() => setOpen(false)}
-              className="text-xs font-medium text-zinc-400 hover:text-accent dark:text-zinc-500"
-            >
-              About
-            </Link>
+            <div className="flex items-center gap-2 text-xs font-medium text-zinc-400 dark:text-zinc-500">
+              <Link href="/about" onClick={() => setOpen(false)} className="hover:text-accent">
+                About
+              </Link>
+              <span aria-hidden>·</span>
+              <Link href="/methodology" onClick={() => setOpen(false)} className="hover:text-accent">
+                Methodology
+              </Link>
+            </div>
           </div>
 
           {isLoggedIn ? (

@@ -30,6 +30,13 @@ export default async function AboutPage() {
           CrossRef (MDPI, individually open-access IEEE, and other publishers), and OpenAlex, and
           keeps growing.
         </p>
+        <p>
+          For the full detail on sourcing, license verification, and PDF-link checks, see{" "}
+          <Link href="/methodology" className="text-accent hover:underline">
+            how Cortexa works
+          </Link>
+          .
+        </p>
       </div>
 
       <div className="mt-10 rounded-xl border border-zinc-200 p-6 dark:border-zinc-800">
