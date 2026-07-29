@@ -1,7 +1,7 @@
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { isLikelyRealPdfUrl } from "@/lib/ingest/pdfUrl";
 import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
 import { upsertPapers } from "@/lib/ingest/upsertPapers";
+import { partitionByExistingDoi } from "@/lib/ingest/alsoIndexedVia";
 import type { Paper } from "@/lib/types";
 
 const OPENALEX_URL = "https://api.openalex.org/works";
@@ -56,7 +56,7 @@ function extractWorkId(fullId: string): string {
 // PDF. open_access.oa_url (sourced from Unpaywall) is far more trustworthy,
 // so that's the only field we use; anything that still looks like a
 // publisher API call gets rejected outright rather than shown as "free PDF".
-export function mapWork(work: OpenAlexWork): Omit<Paper, "id" | "created_at"> | null {
+export function mapWork(work: OpenAlexWork): Omit<Paper, "id" | "created_at" | "also_indexed_via"> | null {
   const title = work.title || work.display_name;
   if (!title) return null;
 
@@ -143,19 +143,14 @@ export async function ingestOpenAlex({ pages = 2, perPage = 100 } = {}) {
       return true;
     });
 
-    // Then skip anything whose DOI we already have from another source
-    // (arXiv/CrossRef) — avoids a papers_doi_unique conflict and keeps
-    // OpenAlex's contribution genuinely additive.
-    const dois = deduped.map((r) => r.doi).filter((d): d is string => Boolean(d));
-    let existingDois = new Set<string>();
-    if (dois.length > 0) {
-      const { data: existing } = await supabaseAdmin.from("papers").select("doi").in("doi", dois);
-      existingDois = new Set((existing ?? []).map((r) => r.doi as string));
-    }
-    const rows = deduped.filter((row) => !row.doi || !existingDois.has(row.doi));
+    // Anything whose DOI we already have from another source (arXiv/CrossRef)
+    // doesn't get a second row — it gets recorded as an "also indexed via"
+    // pointer on the existing row instead, avoiding a papers_doi_unique
+    // conflict while keeping the cross-source info.
+    const { newRows } = await partitionByExistingDoi(deduped);
 
-    if (rows.length > 0) {
-      const { count } = await upsertPapers(rows);
+    if (newRows.length > 0) {
+      const { count } = await upsertPapers(newRows);
       totalUpserted += count;
     }
 

@@ -1,6 +1,7 @@
 import { isLikelyRealPdfUrl } from "@/lib/ingest/pdfUrl";
 import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
 import { upsertPapers } from "@/lib/ingest/upsertPapers";
+import { partitionByExistingDoi } from "@/lib/ingest/alsoIndexedVia";
 import type { Paper } from "@/lib/types";
 
 const CROSSREF_URL = "https://api.crossref.org/works";
@@ -71,7 +72,7 @@ function hasCcLicense(item: CrossrefItem): boolean {
 function mapItem(
   item: CrossrefItem,
   profile: CrossrefProfile
-): Omit<Paper, "id" | "created_at"> | null {
+): Omit<Paper, "id" | "created_at" | "also_indexed_via"> | null {
   if (!item.DOI || !item.title?.[0]) return null;
   if (profile.requireCcLicense && !hasCcLicense(item)) return null;
 
@@ -141,8 +142,11 @@ export async function ingestCrossref({ pages = 3, rowsPerPage = 100 } = {}) {
         .filter((r): r is NonNullable<typeof r> => r !== null);
 
       if (rows.length > 0) {
-        const { count } = await upsertPapers(rows);
-        totalUpserted += count;
+        const { newRows } = await partitionByExistingDoi(rows);
+        if (newRows.length > 0) {
+          const { count } = await upsertPapers(newRows);
+          totalUpserted += count;
+        }
       }
 
       if (page < pages - 1) await sleep(1000);

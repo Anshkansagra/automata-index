@@ -3,6 +3,8 @@ import type { Paper } from "@/lib/types";
 import { SaveButton } from "@/components/SaveButton";
 import { CiteButton } from "@/components/CiteButton";
 import { AbstractText } from "@/components/AbstractText";
+import { PdfPreview } from "@/components/PdfPreview";
+import { AlsoIndexedVia } from "@/components/AlsoIndexedVia";
 
 export function PaperCard({
   paper,
@@ -55,17 +57,21 @@ export function PaperCard({
       )}
 
       {paper.abstract && <AbstractText text={paper.abstract} />}
+      <AlsoIndexedVia entries={paper.also_indexed_via} />
 
       <div className="mt-3 flex gap-3 text-sm">
         {paper.pdf_url && (
-          <a
-            href={paper.pdf_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-accent hover:underline"
-          >
-            View free PDF
-          </a>
+          <>
+            <a
+              href={paper.pdf_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-accent hover:underline"
+            >
+              View free PDF
+            </a>
+            <PdfPreview url={paper.pdf_url} title={paper.title} />
+          </>
         )}
         <a
           href={paper.landing_page_url}

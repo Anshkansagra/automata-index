@@ -1,7 +1,12 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import type { Paper } from "@/lib/types";
 
-type PaperRow = Omit<Paper, "id" | "created_at">;
+// also_indexed_via is deliberately excluded here: it's populated by
+// partitionByExistingDoi's targeted UPDATE, not by ingestion's own upsert.
+// Including it in this payload would overwrite it back to empty every time
+// a source re-fetches a paper it already indexed (which happens on every
+// run, since recent pages keep re-covering recently-seen papers).
+type PaperRow = Omit<Paper, "id" | "created_at" | "also_indexed_via">;
 
 // Every ingest source writes citation_count, but the column ships via its
 // own migration that isn't guaranteed to have landed in every environment

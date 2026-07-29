@@ -2,6 +2,7 @@ import { XMLParser } from "fast-xml-parser";
 import { ARXIV_CATEGORIES } from "@/lib/ingest/categories";
 import { sanitizeDate } from "@/lib/ingest/sanitizeDate";
 import { upsertPapers } from "@/lib/ingest/upsertPapers";
+import { partitionByExistingDoi } from "@/lib/ingest/alsoIndexedVia";
 import type { Paper } from "@/lib/types";
 
 const ARXIV_API_URL = "http://export.arxiv.org/api/query";
@@ -28,7 +29,7 @@ function extractArxivId(entryId: string): string {
   return raw.replace(/v\d+$/, "");
 }
 
-function mapEntry(entry: ArxivEntry): Omit<Paper, "id" | "created_at"> {
+function mapEntry(entry: ArxivEntry): Omit<Paper, "id" | "created_at" | "also_indexed_via"> {
   const arxivId = extractArxivId(entry.id);
   const links = toArray(entry.link);
   const pdfLink = links.find((l) => l["@_title"] === "pdf")?.["@_href"];
@@ -95,7 +96,8 @@ export async function ingestArxiv({ pages = 4, pageSize = 250 } = {}) {
       return true;
     });
 
-    const { count } = await upsertPapers(rows);
+    const { newRows } = await partitionByExistingDoi(rows);
+    const { count } = newRows.length > 0 ? await upsertPapers(newRows) : { count: 0 };
 
     totalFetched += entries.length;
     totalUpserted += count;

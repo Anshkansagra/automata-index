@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/server";
 import { PaperCard } from "@/components/PaperCard";
 import { SaveButton } from "@/components/SaveButton";
 import { CiteButton } from "@/components/CiteButton";
+import { PdfPreview } from "@/components/PdfPreview";
+import { AlsoIndexedVia } from "@/components/AlsoIndexedVia";
 
 const SITE_URL = "https://automata-index.vercel.app";
 
@@ -119,16 +121,21 @@ export default async function PaperDetailPage({
           </p>
         )}
 
+        <AlsoIndexedVia entries={paper.also_indexed_via} />
+
         <div className="mt-6 flex flex-wrap gap-4 text-sm">
           {paper.pdf_url && (
-            <a
-              href={paper.pdf_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-accent hover:underline"
-            >
-              View free PDF
-            </a>
+            <>
+              <a
+                href={paper.pdf_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-accent hover:underline"
+              >
+                View free PDF
+              </a>
+              <PdfPreview url={paper.pdf_url} title={paper.title} />
+            </>
           )}
           <a
             href={paper.landing_page_url}

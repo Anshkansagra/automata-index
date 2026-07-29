@@ -27,7 +27,7 @@ function mapAuthor(a: CoreAuthor): string {
   return typeof a === "string" ? a : a.name;
 }
 
-function mapResult(result: CoreResult): Omit<Paper, "id" | "created_at"> | null {
+function mapResult(result: CoreResult): Omit<Paper, "id" | "created_at" | "also_indexed_via"> | null {
   // Skip anything CORE doesn't actually have full text for — we only ever
   // store/link works we can legally point users to.
   const pdfUrl = result.downloadUrl || result.sourceFulltextUrls?.[0] || null;

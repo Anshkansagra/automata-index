@@ -15,4 +15,5 @@ export type Paper = {
   tldr: string | null;
   created_at: string;
   citation_count: number | null;
+  also_indexed_via: { source: string; publisher: string | null; url: string }[];
 };
