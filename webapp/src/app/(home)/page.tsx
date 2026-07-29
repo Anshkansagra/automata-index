@@ -74,7 +74,7 @@ export default async function Home({
             <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               Explore by topic
             </h2>
-            <TopicExplorer isLoggedIn={!!user} />
+            <TopicExplorer />
           </div>
         </div>
 
