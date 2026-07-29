@@ -1,6 +1,6 @@
-import { supabaseAdmin } from "@/lib/supabase/admin";
 import { mapWork, ARXIV_SOURCE_ID, type OpenAlexWork } from "@/lib/ingest/openalex";
 import { upsertPapers } from "@/lib/ingest/upsertPapers";
+import { partitionByExistingDoi } from "@/lib/ingest/alsoIndexedVia";
 
 const OPENALEX_AUTHORS_URL = "https://api.openalex.org/authors";
 const OPENALEX_WORKS_URL = "https://api.openalex.org/works";
@@ -78,19 +78,13 @@ export async function ingestAuthors({ pages = 2, perPage = 100 } = {}) {
 
         const candidates = works.map(mapWork).filter((r): r is NonNullable<typeof r> => r !== null);
 
-        // Skip anything whose DOI is already indexed from another source
-        // (arXiv/CrossRef/CORE, or an earlier profile for the same person)
-        // to avoid a papers_doi_unique conflict.
-        const dois = candidates.map((r) => r.doi).filter((d): d is string => Boolean(d));
-        let existingDois = new Set<string>();
-        if (dois.length > 0) {
-          const { data: existing } = await supabaseAdmin.from("papers").select("doi").in("doi", dois);
-          existingDois = new Set((existing ?? []).map((r) => r.doi as string));
-        }
-        const rows = candidates.filter((row) => !row.doi || !existingDois.has(row.doi));
+        // Anything whose DOI is already indexed from another source (or an
+        // earlier profile for the same person) gets recorded as an "also
+        // indexed via" pointer instead of a second row.
+        const { newRows } = await partitionByExistingDoi(candidates);
 
-        if (rows.length > 0) {
-          const { count } = await upsertPapers(rows);
+        if (newRows.length > 0) {
+          const { count } = await upsertPapers(newRows);
           upserted += count;
         }
 
