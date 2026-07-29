@@ -5,6 +5,7 @@ const SOURCES: { label: string; value: string }[] = [
   { label: "CORE", value: "core" },
   { label: "MDPI / IEEE (OA)", value: "crossref" },
   { label: "OpenAlex", value: "openalex" },
+  { label: "Semantic Scholar", value: "semantic_scholar" },
 ];
 
 function buildHref(

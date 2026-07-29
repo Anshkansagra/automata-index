@@ -15,6 +15,7 @@ async function getStats() {
     { count: ieee },
     { count: openalex },
     { count: core },
+    { count: semanticScholar },
   ] = await Promise.all([
     supabasePublic.from("papers").select("id", { count: "exact", head: true }),
     supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "arxiv"),
@@ -31,6 +32,10 @@ async function getStats() {
       .ilike("publisher", "%Electrical and Electronics%"),
     supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "openalex"),
     supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "core"),
+    supabasePublic
+      .from("papers")
+      .select("id", { count: "exact", head: true })
+      .eq("source", "semantic_scholar"),
   ]);
 
   return {
@@ -41,6 +46,7 @@ async function getStats() {
     ieee: ieee ?? 0,
     openalex: openalex ?? 0,
     core: core ?? 0,
+    semanticScholar: semanticScholar ?? 0,
   };
 }
 
@@ -76,6 +82,7 @@ export default async function DashboardPage() {
           { label: "IEEE (OA)", value: stats.ieee },
           { label: "OpenAlex", value: stats.openalex },
           { label: "CORE", value: stats.core },
+          { label: "Semantic Scholar", value: stats.semanticScholar },
         ].map((stat) => (
           <div
             key={stat.label}

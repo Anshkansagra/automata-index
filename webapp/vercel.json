@@ -4,6 +4,7 @@
     { "path": "/api/ingest/openalex", "schedule": "30 3 * * *" },
     { "path": "/api/ingest/crossref", "schedule": "0 4 * * *" },
     { "path": "/api/ingest/core", "schedule": "0 5 * * *" },
+    { "path": "/api/ingest/semantic-scholar", "schedule": "30 4 * * *" },
     { "path": "/api/ingest/authors", "schedule": "0 5 * * 0" },
     { "path": "/api/digest/send", "schedule": "0 6 * * *" }
   ]
