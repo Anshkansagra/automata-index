@@ -344,6 +344,10 @@ export function SidebarClient({
               <Link href="/methodology" onClick={() => setOpen(false)} className="hover:text-accent">
                 Methodology
               </Link>
+              <span aria-hidden>·</span>
+              <Link href="/developers" onClick={() => setOpen(false)} className="hover:text-accent">
+                API
+              </Link>
             </div>
           </div>
 

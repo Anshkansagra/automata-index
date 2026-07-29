@@ -2,6 +2,8 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileForm } from "@/components/ProfileForm";
+import { ApiKeysManager } from "@/components/ApiKeysManager";
+import { getApiKeys } from "@/lib/apiKeys";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -15,6 +17,7 @@ export default async function ProfilePage() {
 
   const hasPassword = (user.identities ?? []).some((i) => i.provider === "email");
   const provider = user.app_metadata?.provider ?? "email";
+  const apiKeys = await getApiKeys(supabase, user.id);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
@@ -51,6 +54,11 @@ export default async function ProfilePage() {
           researchInterests={(user.user_metadata?.research_interests as string[]) ?? []}
           twitterUrl={(user.user_metadata?.twitter_url as string) ?? ""}
         />
+      </div>
+
+      <div className="mt-6 rounded-xl border border-zinc-200 p-6 dark:border-zinc-800">
+        <h2 className="mb-4 text-lg font-semibold text-zinc-900 dark:text-zinc-50">API access</h2>
+        <ApiKeysManager initialKeys={apiKeys} />
       </div>
     </div>
   );

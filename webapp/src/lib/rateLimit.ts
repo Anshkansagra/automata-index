@@ -15,3 +15,14 @@ export const rateLimiter = new Ratelimit({
   prefix: "cortexa-ratelimit",
   analytics: true,
 });
+
+// Separate bucket for the public API (keyed per API key, not per IP) — a
+// generous but bounded quota for the free tier, independent of the
+// site-wide per-IP limit above so a legitimate API consumer sharing an
+// egress IP with other traffic isn't unfairly throttled.
+export const apiKeyRateLimiter = new Ratelimit({
+  redis,
+  limiter: Ratelimit.slidingWindow(60, "60 s"),
+  prefix: "cortexa-api-ratelimit",
+  analytics: true,
+});
