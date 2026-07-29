@@ -17,16 +17,23 @@ export async function getSavedPaperIdSet(
   return new Set(data.map((row) => row.paper_id as string));
 }
 
+export type SavedPaper = Paper & { collection_id: string | null };
+
 export async function getSavedPapers(
   supabase: SupabaseClient,
   userId: string
-): Promise<Paper[]> {
+): Promise<SavedPaper[]> {
   const { data, error } = await supabase
     .from("saved_papers")
-    .select("created_at, papers(*)")
+    .select("created_at, collection_id, papers(*)")
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 
   if (error || !data) return [];
-  return data.map((row) => row.papers as unknown as Paper).filter(Boolean);
+  return data
+    .filter((row) => row.papers)
+    .map((row) => ({
+      ...(row.papers as unknown as Paper),
+      collection_id: row.collection_id as string | null,
+    }));
 }

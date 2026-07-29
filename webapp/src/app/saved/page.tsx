@@ -3,9 +3,10 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { getSavedPapers } from "@/lib/savedPapers";
 import { getSavedSearches } from "@/lib/savedSearches";
-import { PaperCard } from "@/components/PaperCard";
+import { getCollections } from "@/lib/collections";
 import { SavedSearchList } from "@/components/SavedSearchList";
-import { RoboticGripper } from "@/components/illustrations";
+import { SavedPapersExport } from "@/components/SavedPapersExport";
+import { SavedPapersSection } from "@/components/SavedPapersSection";
 
 export default async function SavedPapersPage() {
   const supabase = await createClient();
@@ -17,11 +18,11 @@ export default async function SavedPapersPage() {
     redirect("/login");
   }
 
-  const [papers, searches] = await Promise.all([
+  const [papers, searches, collections] = await Promise.all([
     getSavedPapers(supabase, user.id),
     getSavedSearches(supabase, user.id),
+    getCollections(supabase, user.id),
   ]);
-  const savedIds = new Set(papers.map((p) => p.id));
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
@@ -45,36 +46,13 @@ export default async function SavedPapersPage() {
       </div>
 
       <div className="mt-10">
-        <h2 className="mb-2 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
-          Saved papers
-        </h2>
-        {papers.length === 0 ? (
-          <div className="flex flex-col items-center gap-4 py-16 text-center">
-            <div className="h-40 w-40 text-zinc-300 dark:text-zinc-700">
-              <RoboticGripper />
-            </div>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400">
-              No saved papers yet.
-            </p>
-            <Link
-              href="/#browse"
-              className="rounded-full bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent-hover"
-            >
-              Browse papers
-            </Link>
-          </div>
-        ) : (
-          <div className="papers-columns">
-            {papers.map((paper) => (
-              <PaperCard
-                key={paper.id}
-                paper={paper}
-                isLoggedIn={true}
-                isSaved={savedIds.has(paper.id)}
-              />
-            ))}
-          </div>
-        )}
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            Saved papers
+          </h2>
+          <SavedPapersExport papers={papers} />
+        </div>
+        <SavedPapersSection userId={user.id} initialPapers={papers} initialCollections={collections} />
       </div>
     </div>
   );
