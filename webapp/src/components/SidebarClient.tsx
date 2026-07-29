@@ -334,21 +334,20 @@ export function SidebarClient({
         )}
 
         <div className="mt-auto flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
-          <div className="flex items-center justify-between">
-            <MiniThemeToggle />
-            <div className="flex items-center gap-2 text-xs font-medium text-zinc-400 dark:text-zinc-500">
-              <Link href="/about" onClick={() => setOpen(false)} className="hover:text-accent">
-                About
-              </Link>
-              <span aria-hidden>·</span>
-              <Link href="/methodology" onClick={() => setOpen(false)} className="hover:text-accent">
-                Methodology
-              </Link>
-              <span aria-hidden>·</span>
-              <Link href="/developers" onClick={() => setOpen(false)} className="hover:text-accent">
-                API
-              </Link>
-            </div>
+          <MiniThemeToggle />
+
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-zinc-400 dark:text-zinc-500">
+            <Link href="/developers" onClick={() => setOpen(false)} className="hover:text-accent">
+              API
+            </Link>
+            <span aria-hidden>·</span>
+            <Link href="/methodology" onClick={() => setOpen(false)} className="hover:text-accent">
+              Methodology
+            </Link>
+            <span aria-hidden>·</span>
+            <Link href="/about" onClick={() => setOpen(false)} className="hover:text-accent">
+              About
+            </Link>
           </div>
 
           {isLoggedIn ? (

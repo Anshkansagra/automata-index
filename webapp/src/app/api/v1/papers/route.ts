@@ -3,10 +3,32 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { getPapers, type PaperSort } from "@/lib/queries";
 import { hashApiKey } from "@/lib/apiKeys";
 import { apiKeyRateLimiter } from "@/lib/rateLimit";
+import type { Paper } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 const MAX_LIMIT = 50;
+
+// getPapers() returns full DB rows (e.g. the raw search_vector tsvector used
+// internally for full-text search) — the public API should only ever expose
+// the documented, stable shape, not implementation details.
+function toPublicPaper(p: Paper) {
+  return {
+    id: p.id,
+    title: p.title,
+    authors: p.authors,
+    abstract: p.abstract,
+    published_date: p.published_date,
+    categories: p.categories,
+    source: p.source,
+    doi: p.doi,
+    publisher: p.publisher,
+    pdf_url: p.pdf_url,
+    landing_page_url: p.landing_page_url,
+    citation_count: p.citation_count,
+    also_indexed_via: p.also_indexed_via,
+  };
+}
 
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization") ?? "";
@@ -54,8 +76,9 @@ export async function GET(request: NextRequest) {
 
   try {
     const papers = await getPapers({ q, source, sort, yearFrom, yearTo, limit: resultLimit });
+    const results = papers.map(toPublicPaper);
     return NextResponse.json(
-      { results: papers, count: papers.length },
+      { results, count: results.length },
       { headers: { "X-RateLimit-Limit": String(limit), "X-RateLimit-Remaining": String(remaining) } }
     );
   } catch (err) {
