@@ -31,6 +31,15 @@ function buildHref(
   return qs ? `/?${qs}` : "/";
 }
 
+function buildFeedHref(q: string, activeSources: string[], sort?: string) {
+  const params = new URLSearchParams();
+  if (q) params.set("q", q);
+  if (activeSources.length > 0) params.set("source", activeSources.join(","));
+  if (sort) params.set("sort", sort);
+  const qs = params.toString();
+  return qs ? `/feed.xml?${qs}` : "/feed.xml";
+}
+
 export function FilterPills({
   q,
   activeSources,
@@ -69,6 +78,16 @@ export function FilterPills({
           </Link>
         );
       })}
+      <a
+        href={buildFeedHref(q, activeSources, extraParams.sort)}
+        title="Subscribe to this search as an RSS feed"
+        className="flex items-center gap-1 rounded-full border border-zinc-300 px-3 py-1 text-sm text-zinc-500 transition-colors hover:border-accent hover:text-accent dark:border-zinc-700 dark:text-zinc-400"
+      >
+        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor">
+          <path d="M4 4a16 16 0 0 1 16 16h-3a13 13 0 0 0-13-13V4zM4 10a10 10 0 0 1 10 10h-3a7 7 0 0 0-7-7v-3zM6.5 15.5A2.5 2.5 0 1 1 4 18a2.5 2.5 0 0 1 2.5-2.5z" />
+        </svg>
+        RSS
+      </a>
     </div>
   );
 }
