@@ -8,7 +8,21 @@ const OPENALEX_WORKS_URL = "https://api.openalex.org/works";
 // Researchers whose open-access work should always be indexed, even when it
 // falls outside the broad topic-keyword queries the other ingest pipelines
 // use — requested directly rather than discovered via keyword search.
-const TARGET_AUTHORS = ["Chang Yoong Choon", "Sagar Kavaiya", "Hiren Mewada"];
+//
+// openAlexId pins an exact profile for names OpenAlex shares between
+// unrelated people (e.g. two different "Hardik Modi"s — one at CHARUSAT, one
+// at Bristol-Myers Squibb) — confirmed via openalex.org/authors search plus
+// cross-checking that they co-author together, not just name-matched.
+// Without an id, all profiles exactly matching the name are used (handles
+// OpenAlex splitting one real person into several unmerged profiles).
+const TARGET_AUTHORS: { name: string; openAlexId?: string }[] = [
+  { name: "Chang Yoong Choon" },
+  { name: "Sagar Kavaiya" },
+  { name: "Hiren Mewada" },
+  { name: "Dharmendra Chauhan", openAlexId: "A5066023329" },
+  { name: "Hardik Modi", openAlexId: "A5041454708" },
+  { name: "Sagarkumar Patel", openAlexId: "A5073876826" },
+];
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -60,8 +74,8 @@ export async function ingestAuthors({ pages = 2, perPage = 100 } = {}) {
   const mailto = process.env.CROSSREF_MAILTO;
   const results: { author: string; found: boolean; fetched: number; upserted: number }[] = [];
 
-  for (const name of TARGET_AUTHORS) {
-    const authorIds = await findAuthorIds(name, mailto);
+  for (const { name, openAlexId } of TARGET_AUTHORS) {
+    const authorIds = openAlexId ? [openAlexId] : await findAuthorIds(name, mailto);
     if (authorIds.length === 0) {
       results.push({ author: name, found: false, fetched: 0, upserted: 0 });
       continue;
