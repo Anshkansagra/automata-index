@@ -88,6 +88,18 @@ export async function sendDigests() {
     // whatever they missed once they turn it back on.
     if (userData.user.user_metadata?.digest_emails_enabled === false) continue;
 
+    // Weekly users are skipped entirely (not just "not sent") on off days —
+    // advancing last_notified_at anyway would only give them a 1-day lookback
+    // once their real send day arrives, defeating "weekly".
+    const frequency = userData.user.user_metadata?.digest_frequency === "weekly" ? "weekly" : "daily";
+    if (frequency === "weekly") {
+      const lastSent = userData.user.user_metadata?.last_digest_sent_at as string | undefined;
+      const daysSinceLastSent = lastSent
+        ? (Date.now() - new Date(lastSent).getTime()) / (1000 * 60 * 60 * 24)
+        : Infinity;
+      if (daysSinceLastSent < 7) continue;
+    }
+
     const sections: { search: SavedSearch; papers: Paper[] }[] = [];
 
     for (const search of userSearches) {
@@ -104,6 +116,12 @@ export async function sendDigests() {
       html: renderDigestHtml(sections),
     });
     usersEmailed++;
+
+    if (frequency === "weekly") {
+      await supabaseAdmin.auth.admin.updateUserById(userId, {
+        user_metadata: { ...userData.user.user_metadata, last_digest_sent_at: runStartedAt },
+      });
+    }
   }
 
   if (processedSearchIds.length > 0) {

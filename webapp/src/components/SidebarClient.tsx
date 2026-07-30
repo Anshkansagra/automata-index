@@ -81,6 +81,14 @@ function XIcon() {
     </svg>
   );
 }
+function GearIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.6 1z" />
+    </svg>
+  );
+}
 
 const LOGGED_IN_LINKS = [
   { href: "/", label: "Home", Icon: HomeIcon },
@@ -88,7 +96,13 @@ const LOGGED_IN_LINKS = [
   { href: "/saved", label: "Saved", Icon: BookmarkIcon },
   { href: "/dashboard", label: "Dashboard", Icon: GridIcon },
   { href: "/profile", label: "Profile", Icon: UserIcon },
+  { href: "/settings", label: "Settings", Icon: GearIcon },
   { href: "/feedback", label: "Feedback", Icon: MessageIcon },
+];
+
+const SHORTCUTS = [
+  { keys: "/", description: "Jump to the search bar" },
+  { keys: "?", description: "Show this shortcuts reference" },
 ];
 
 const LOGGED_OUT_LINKS = [
@@ -157,6 +171,7 @@ export function SidebarClient({
   savedCount,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [searches, setSearches] = useState(recentSearches);
   const [prevRecentSearches, setPrevRecentSearches] = useState(recentSearches);
   const router = useRouter();
@@ -185,19 +200,27 @@ export function SidebarClient({
     deleteSearchHistory(supabase, userId, term);
   }
 
-  // "/" jumps to search, like most professional apps — ignored while the
-  // user is already typing somewhere so it doesn't hijack normal typing.
+  // "/" jumps to search and "?" opens the shortcuts reference, like most
+  // professional apps — ignored while the user is already typing somewhere
+  // so it doesn't hijack normal typing.
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key !== "/") return;
       const target = e.target as HTMLElement;
       const isTyping = ["INPUT", "TEXTAREA"].includes(target.tagName) || target.isContentEditable;
-      if (isTyping) return;
-      e.preventDefault();
-      router.push("/#browse");
-      setTimeout(() => {
-        document.querySelector<HTMLInputElement>('input[name="q"]')?.focus();
-      }, 100);
+
+      if (e.key === "/" && !isTyping) {
+        e.preventDefault();
+        router.push("/#browse");
+        setTimeout(() => {
+          document.querySelector<HTMLInputElement>('input[name="q"]')?.focus();
+        }, 100);
+        return;
+      }
+
+      if (e.key === "?" && !isTyping) {
+        e.preventDefault();
+        setShortcutsOpen((prev) => !prev);
+      }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -372,6 +395,40 @@ export function SidebarClient({
           )}
         </div>
       </aside>
+
+      {shortcutsOpen && (
+        <div
+          className="fixed inset-0 z-[70] flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setShortcutsOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-xl border border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Keyboard shortcuts</h2>
+              <button
+                type="button"
+                onClick={() => setShortcutsOpen(false)}
+                aria-label="Close"
+                className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
+              >
+                <XIcon />
+              </button>
+            </div>
+            <div className="flex flex-col gap-2">
+              {SHORTCUTS.map((s) => (
+                <div key={s.keys} className="flex items-center gap-3 text-sm">
+                  <kbd className="rounded border border-zinc-300 bg-zinc-100 px-2 py-0.5 font-mono text-xs text-zinc-700 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
+                    {s.keys}
+                  </kbd>
+                  <span className="text-zinc-600 dark:text-zinc-400">{s.description}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

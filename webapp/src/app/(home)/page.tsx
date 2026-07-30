@@ -25,10 +25,6 @@ export default async function Home({
   }>;
 }) {
   const { q = "", source, sort, yearFrom, yearTo } = await searchParams;
-  const activeSources = source ? source.split(",").map((s) => s.trim()).filter(Boolean) : [];
-  const activeSort: PaperSort = sort === "cited" ? "cited" : "recent";
-  const yearFromNum = yearFrom ? Number(yearFrom) : undefined;
-  const yearToNum = yearTo ? Number(yearTo) : undefined;
 
   const supabase = await createClient();
   const {
@@ -38,8 +34,30 @@ export default async function Home({
     ? user.user_metadata.citation_style
     : undefined;
 
+  // Only fall back to the user's saved defaults when they haven't explicitly
+  // picked something this visit — an explicit choice in the URL always wins.
+  const defaultSource = (user?.user_metadata?.default_source as string) || "";
+  const defaultSort = user?.user_metadata?.default_sort === "cited" ? "cited" : "recent";
+  const resultsPerPage = Number(user?.user_metadata?.results_per_page) || 30;
+
+  const activeSources = source
+    ? source.split(",").map((s) => s.trim()).filter(Boolean)
+    : defaultSource
+      ? [defaultSource]
+      : [];
+  const activeSort: PaperSort = sort ? (sort === "cited" ? "cited" : "recent") : defaultSort;
+  const yearFromNum = yearFrom ? Number(yearFrom) : undefined;
+  const yearToNum = yearTo ? Number(yearTo) : undefined;
+
   const [papers, savedIds] = await Promise.all([
-    getPapers({ q, sources: activeSources, sort: activeSort, yearFrom: yearFromNum, yearTo: yearToNum }),
+    getPapers({
+      q,
+      sources: activeSources,
+      sort: activeSort,
+      yearFrom: yearFromNum,
+      yearTo: yearToNum,
+      limit: resultsPerPage,
+    }),
     user ? getSavedPaperIdSet(supabase, user.id) : Promise.resolve(new Set<string>()),
   ]);
 

@@ -24,12 +24,14 @@ export default async function ProfilePage() {
     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-8">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">Profile</h1>
-        <Link
-          href="/dashboard"
-          className="text-sm font-medium text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50"
-        >
-          ← Dashboard
-        </Link>
+        <div className="flex items-center gap-4 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+          <Link href="/settings" className="hover:text-zinc-900 dark:hover:text-zinc-50">
+            Settings
+          </Link>
+          <Link href="/dashboard" className="hover:text-zinc-900 dark:hover:text-zinc-50">
+            ← Dashboard
+          </Link>
+        </div>
       </div>
 
       <div className="mt-6">
@@ -43,7 +45,6 @@ export default async function ProfilePage() {
             (user.user_metadata?.picture as string) ??
             null
           }
-          notificationsEnabled={user.user_metadata?.digest_emails_enabled !== false}
           hasPassword={hasPassword}
           provider={provider}
           mobile={(user.user_metadata?.mobile as string) ?? ""}

@@ -13,7 +13,6 @@ type Props = {
   fullName: string;
   affiliation: string;
   avatarUrl: string | null;
-  notificationsEnabled: boolean;
   hasPassword: boolean;
   provider: string;
   mobile: string;
@@ -78,7 +77,6 @@ export function ProfileForm({
   fullName,
   affiliation,
   avatarUrl,
-  notificationsEnabled,
   hasPassword,
   provider,
   mobile,
@@ -123,9 +121,6 @@ export function ProfileForm({
   const [currentAvatarUrl, setCurrentAvatarUrl] = useState(avatarUrl);
   const [avatarStatus, setAvatarStatus] = useState<"idle" | "uploading" | "error">("idle");
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [notifEnabled, setNotifEnabled] = useState(notificationsEnabled);
-  const [notifStatus, setNotifStatus] = useState<"idle" | "saving" | "saved">("idle");
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -187,16 +182,6 @@ export function ProfileForm({
     } catch {
       setAvatarStatus("error");
     }
-  }
-
-  async function toggleNotifications(checked: boolean) {
-    setNotifEnabled(checked);
-    setNotifStatus("saving");
-    const supabase = createClient();
-    const { error } = await supabase.auth.updateUser({
-      data: { digest_emails_enabled: checked },
-    });
-    setNotifStatus(error ? "idle" : "saved");
   }
 
   async function changePassword(e: React.FormEvent) {
@@ -417,23 +402,6 @@ export function ProfileForm({
       <SectionCard title="Display">
         <p className="mb-3 text-sm text-zinc-500 dark:text-zinc-400">Theme</p>
         <ThemeToggle />
-      </SectionCard>
-
-      <SectionCard title="Notifications">
-        <label className="flex items-center justify-between gap-4">
-          <span className="text-sm text-zinc-700 dark:text-zinc-300">
-            Email me about new papers matching my saved searches
-          </span>
-          <input
-            type="checkbox"
-            checked={notifEnabled}
-            onChange={(e) => toggleNotifications(e.target.checked)}
-            className="h-5 w-5 accent-[var(--accent)]"
-          />
-        </label>
-        {notifStatus === "saved" && (
-          <p className="mt-2 text-xs text-green-600 dark:text-green-400">Preference saved</p>
-        )}
       </SectionCard>
 
       <SectionCard title="Security">

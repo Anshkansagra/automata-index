@@ -38,3 +38,7 @@ export async function getRecentSearchHistory(
 export async function deleteSearchHistory(supabase: SupabaseClient, userId: string, query: string) {
   await supabase.from("search_history").delete().eq("user_id", userId).eq("query", query);
 }
+
+export async function clearAllSearchHistory(supabase: SupabaseClient, userId: string) {
+  await supabase.from("search_history").delete().eq("user_id", userId);
+}
