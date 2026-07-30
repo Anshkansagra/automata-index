@@ -17,5 +17,8 @@ export function sanitizeDate(iso: string | null | undefined): string | null {
   maxAllowed.setUTCDate(maxAllowed.getUTCDate() + FUTURE_SLACK_DAYS);
   if (date > maxAllowed) return null;
 
-  return iso;
+  // Normalize to YYYY-MM-DD — some sources (e.g. Zenodo) supply partial
+  // dates like "2024-01" that parse fine in JS but that Postgres's `date`
+  // column rejects outright as invalid syntax.
+  return date.toISOString().slice(0, 10);
 }

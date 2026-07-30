@@ -17,6 +17,7 @@ async function getStats() {
     { count: openalex },
     { count: core },
     { count: semanticScholar },
+    { count: zenodo },
   ] = await Promise.all([
     supabasePublic.from("papers").select("id", { count: "exact", head: true }),
     supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "arxiv"),
@@ -37,6 +38,7 @@ async function getStats() {
       .from("papers")
       .select("id", { count: "exact", head: true })
       .eq("source", "semantic_scholar"),
+    supabasePublic.from("papers").select("id", { count: "exact", head: true }).eq("source", "zenodo"),
   ]);
 
   return {
@@ -48,6 +50,7 @@ async function getStats() {
     openalex: openalex ?? 0,
     core: core ?? 0,
     semanticScholar: semanticScholar ?? 0,
+    zenodo: zenodo ?? 0,
   };
 }
 
@@ -87,6 +90,7 @@ export default async function DashboardPage() {
           { label: "OpenAlex", value: stats.openalex },
           { label: "CORE", value: stats.core },
           { label: "Semantic Scholar", value: stats.semanticScholar },
+          { label: "Zenodo", value: stats.zenodo },
         ].map((stat) => (
           <div
             key={stat.label}

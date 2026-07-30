@@ -1,6 +1,6 @@
 export type Paper = {
   id: string;
-  source: "arxiv" | "core" | "semantic_scholar" | "crossref" | "openalex";
+  source: "arxiv" | "core" | "semantic_scholar" | "crossref" | "openalex" | "zenodo";
   source_id: string;
   doi: string | null;
   title: string;

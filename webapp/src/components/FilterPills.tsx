@@ -6,6 +6,7 @@ const SOURCES: { label: string; value: string }[] = [
   { label: "MDPI / IEEE (OA)", value: "crossref" },
   { label: "OpenAlex", value: "openalex" },
   { label: "Semantic Scholar", value: "semantic_scholar" },
+  { label: "Zenodo", value: "zenodo" },
 ];
 
 function buildHref(
