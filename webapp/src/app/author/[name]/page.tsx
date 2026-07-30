@@ -4,6 +4,7 @@ import { getPapersByAuthor } from "@/lib/queries";
 import { getSavedPaperIdSet } from "@/lib/savedPapers";
 import { createClient } from "@/lib/supabase/server";
 import { PaperCard } from "@/components/PaperCard";
+import { isCitationStyle } from "@/lib/citation";
 
 export async function generateMetadata({
   params,
@@ -30,6 +31,9 @@ export default async function AuthorPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const citationStyle = isCitationStyle(user?.user_metadata?.citation_style)
+    ? user.user_metadata.citation_style
+    : undefined;
 
   const [papers, savedIds] = await Promise.all([
     getPapersByAuthor(author),
@@ -62,6 +66,7 @@ export default async function AuthorPage({
               paper={paper}
               isLoggedIn={!!user}
               isSaved={savedIds.has(paper.id)}
+              citationStyle={citationStyle}
             />
           ))}
         </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Paper } from "@/lib/types";
+import type { CitationStyle } from "@/lib/citation";
 import { SaveButton } from "@/components/SaveButton";
 import { CiteButton } from "@/components/CiteButton";
 import { AbstractText } from "@/components/AbstractText";
@@ -10,10 +11,12 @@ export function PaperCard({
   paper,
   isLoggedIn = false,
   isSaved = false,
+  citationStyle,
 }: {
   paper: Paper;
   isLoggedIn?: boolean;
   isSaved?: boolean;
+  citationStyle?: CitationStyle;
 }) {
   return (
     <article className="rounded-lg border border-zinc-200 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent/40 hover:shadow-lg dark:border-zinc-800 dark:hover:shadow-black/40">
@@ -81,7 +84,7 @@ export function PaperCard({
         >
           Source page
         </a>
-        <CiteButton paper={paper} />
+        <CiteButton paper={paper} defaultStyle={citationStyle} />
         {isLoggedIn && <SaveButton paperId={paper.id} initialSaved={isSaved} />}
       </div>
     </article>

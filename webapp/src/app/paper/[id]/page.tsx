@@ -9,6 +9,7 @@ import { SaveButton } from "@/components/SaveButton";
 import { CiteButton } from "@/components/CiteButton";
 import { PdfPreview } from "@/components/PdfPreview";
 import { AlsoIndexedVia } from "@/components/AlsoIndexedVia";
+import { isCitationStyle } from "@/lib/citation";
 
 const SITE_URL = "https://automata-index.vercel.app";
 
@@ -58,6 +59,9 @@ export default async function PaperDetailPage({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const citationStyle = isCitationStyle(user?.user_metadata?.citation_style)
+    ? user.user_metadata.citation_style
+    : undefined;
 
   const [related, savedIds] = await Promise.all([
     getRelatedPapers(paper),
@@ -145,7 +149,7 @@ export default async function PaperDetailPage({
           >
             Source page
           </a>
-          <CiteButton paper={paper} />
+          <CiteButton paper={paper} defaultStyle={citationStyle} />
           {user && <SaveButton paperId={paper.id} initialSaved={savedIds.has(paper.id)} />}
         </div>
       </article>
@@ -157,7 +161,13 @@ export default async function PaperDetailPage({
           </h2>
           <div className="papers-columns">
             {related.map((r) => (
-              <PaperCard key={r.id} paper={r} isLoggedIn={!!user} isSaved={savedIds.has(r.id)} />
+              <PaperCard
+                key={r.id}
+                paper={r}
+                isLoggedIn={!!user}
+                isSaved={savedIds.has(r.id)}
+                citationStyle={citationStyle}
+              />
             ))}
           </div>
         </div>

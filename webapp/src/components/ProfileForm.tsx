@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Avatar } from "@/components/Avatar";
+import { CITATION_STYLE_LABELS, type CitationStyle } from "@/lib/citation";
 
 type Props = {
   userId: string;
@@ -23,7 +24,10 @@ type Props = {
   bio: string;
   researchInterests: string[];
   twitterUrl: string;
+  citationStyle: CitationStyle;
 };
+
+const CITATION_STYLES = Object.keys(CITATION_STYLE_LABELS) as CitationStyle[];
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -85,6 +89,7 @@ export function ProfileForm({
   bio,
   researchInterests,
   twitterUrl,
+  citationStyle,
 }: Props) {
   const router = useRouter();
   const [name, setName] = useState(fullName);
@@ -98,6 +103,7 @@ export function ProfileForm({
   const [interests, setInterests] = useState(researchInterests);
   const [interestInput, setInterestInput] = useState("");
   const [twitter, setTwitter] = useState(twitterUrl);
+  const [citeStyle, setCiteStyle] = useState<CitationStyle>(citationStyle);
   const [infoStatus, setInfoStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
   function addInterest(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -146,6 +152,7 @@ export function ProfileForm({
         bio: bioText,
         research_interests: interests,
         twitter_url: twitter,
+        citation_style: citeStyle,
       },
     });
     setInfoStatus(error ? "error" : "saved");
@@ -344,6 +351,24 @@ export function ProfileForm({
                 className="min-w-[8rem] flex-1 bg-transparent text-sm outline-none placeholder:text-zinc-400"
               />
             </div>
+          </div>
+          <div>
+            <label className={labelClass()}>Preferred citation style</label>
+            <select
+              value={citeStyle}
+              onChange={(e) => setCiteStyle(e.target.value as CitationStyle)}
+              className={inputClass()}
+            >
+              {CITATION_STYLES.map((s) => (
+                <option key={s} value={s}>
+                  {CITATION_STYLE_LABELS[s]}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">
+              Used by default when you click &ldquo;Cite&rdquo; on a paper — you can still switch styles
+              per citation from the dropdown next to it.
+            </p>
           </div>
           <div>
             <label className={labelClass()}>X / Twitter URL</label>

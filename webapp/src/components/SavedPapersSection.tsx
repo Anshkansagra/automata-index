@@ -7,6 +7,7 @@ import { PaperCard } from "@/components/PaperCard";
 import { RoboticGripper } from "@/components/illustrations";
 import type { Collection } from "@/lib/collections";
 import type { SavedPaper } from "@/lib/savedPapers";
+import type { CitationStyle } from "@/lib/citation";
 
 function pillClass(active: boolean) {
   return `rounded-full border px-3 py-1 text-sm transition-colors ${
@@ -20,10 +21,12 @@ export function SavedPapersSection({
   userId,
   initialPapers,
   initialCollections,
+  citationStyle,
 }: {
   userId: string;
   initialPapers: SavedPaper[];
   initialCollections: Collection[];
+  citationStyle?: CitationStyle;
 }) {
   const [papers, setPapers] = useState(initialPapers);
   const [collections, setCollections] = useState(initialCollections);
@@ -141,7 +144,7 @@ export function SavedPapersSection({
         <div className="papers-columns">
           {visible.map((paper) => (
             <div key={paper.id}>
-              <PaperCard paper={paper} isLoggedIn isSaved />
+              <PaperCard paper={paper} isLoggedIn isSaved citationStyle={citationStyle} />
               {collections.length > 0 && (
                 <div className="mt-1.5 flex items-center gap-1.5 px-1">
                   <label className="text-xs text-zinc-400 dark:text-zinc-500">Collection</label>

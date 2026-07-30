@@ -11,6 +11,7 @@ import { TopicExplorer } from "@/components/TopicExplorer";
 import { SaveSearchButton } from "@/components/SaveSearchButton";
 import { logSearch } from "@/lib/searchHistory";
 import { NeuralNetwork } from "@/components/illustrations";
+import { isCitationStyle } from "@/lib/citation";
 
 export default async function Home({
   searchParams,
@@ -33,6 +34,9 @@ export default async function Home({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const citationStyle = isCitationStyle(user?.user_metadata?.citation_style)
+    ? user.user_metadata.citation_style
+    : undefined;
 
   const [papers, savedIds] = await Promise.all([
     getPapers({ q, sources: activeSources, sort: activeSort, yearFrom: yearFromNum, yearTo: yearToNum }),
@@ -95,6 +99,7 @@ export default async function Home({
                 paper={paper}
                 isLoggedIn={!!user}
                 isSaved={savedIds.has(paper.id)}
+                citationStyle={citationStyle}
               />
             ))}
           </div>

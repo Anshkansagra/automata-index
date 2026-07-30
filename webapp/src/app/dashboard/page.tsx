@@ -5,6 +5,7 @@ import { supabasePublic } from "@/lib/supabase/public";
 import { getPapers } from "@/lib/queries";
 import { getSavedPaperIdSet } from "@/lib/savedPapers";
 import { PaperCard } from "@/components/PaperCard";
+import { isCitationStyle } from "@/lib/citation";
 
 async function getStats() {
   const [
@@ -66,6 +67,9 @@ export default async function DashboardPage() {
     getSavedPaperIdSet(supabase, user.id),
   ]);
   const name = (user.user_metadata?.full_name as string | undefined) || user.email;
+  const citationStyle = isCitationStyle(user.user_metadata?.citation_style)
+    ? user.user_metadata.citation_style
+    : undefined;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
@@ -123,6 +127,7 @@ export default async function DashboardPage() {
             paper={paper}
             isLoggedIn={true}
             isSaved={savedIds.has(paper.id)}
+            citationStyle={citationStyle}
           />
         ))}
       </div>

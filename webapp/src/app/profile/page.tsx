@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ProfileForm } from "@/components/ProfileForm";
 import { ApiKeysManager } from "@/components/ApiKeysManager";
 import { getApiKeys } from "@/lib/apiKeys";
+import { isCitationStyle } from "@/lib/citation";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
@@ -53,6 +54,7 @@ export default async function ProfilePage() {
           bio={(user.user_metadata?.bio as string) ?? ""}
           researchInterests={(user.user_metadata?.research_interests as string[]) ?? []}
           twitterUrl={(user.user_metadata?.twitter_url as string) ?? ""}
+          citationStyle={isCitationStyle(user.user_metadata?.citation_style) ? user.user_metadata.citation_style : "bibtex"}
         />
       </div>
 

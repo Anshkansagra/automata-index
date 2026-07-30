@@ -7,6 +7,7 @@ import { getCollections } from "@/lib/collections";
 import { SavedSearchList } from "@/components/SavedSearchList";
 import { SavedPapersExport } from "@/components/SavedPapersExport";
 import { SavedPapersSection } from "@/components/SavedPapersSection";
+import { isCitationStyle } from "@/lib/citation";
 
 export default async function SavedPapersPage() {
   const supabase = await createClient();
@@ -17,6 +18,9 @@ export default async function SavedPapersPage() {
   if (!user) {
     redirect("/login");
   }
+  const citationStyle = isCitationStyle(user.user_metadata?.citation_style)
+    ? user.user_metadata.citation_style
+    : undefined;
 
   const [papers, searches, collections] = await Promise.all([
     getSavedPapers(supabase, user.id),
@@ -52,7 +56,12 @@ export default async function SavedPapersPage() {
           </h2>
           <SavedPapersExport papers={papers} />
         </div>
-        <SavedPapersSection userId={user.id} initialPapers={papers} initialCollections={collections} />
+        <SavedPapersSection
+          userId={user.id}
+          initialPapers={papers}
+          initialCollections={collections}
+          citationStyle={citationStyle}
+        />
       </div>
     </div>
   );
