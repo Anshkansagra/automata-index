@@ -59,7 +59,9 @@ export function PaperCard({
         </p>
       )}
 
-      {paper.abstract && <AbstractText text={paper.abstract} />}
+      {paper.abstract && (
+        <AbstractText text={paper.abstract.length > 800 ? paper.abstract.slice(0, 800).trimEnd() + "…" : paper.abstract} />
+      )}
       <AlsoIndexedVia entries={paper.also_indexed_via} />
 
       <div className="mt-3 flex gap-3 text-sm">

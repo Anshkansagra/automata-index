@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
   <channel>
     <title>${escapeXml(title)}</title>
     <link>${SITE_URL}</link>
-    <atom:link xmlns:atom="http://www.w3.org/2005/Atom" href="${feedUrl}" rel="self" type="application/rss+xml" />
+    <atom:link xmlns:atom="http://www.w3.org/2005/Atom" href="${escapeXml(feedUrl)}" rel="self" type="application/rss+xml" />
     <description>Free, open-access research papers on robotics, machine learning, and AI.</description>
     <language>en-us</language>${items}
   </channel>
