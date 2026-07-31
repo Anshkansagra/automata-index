@@ -1,13 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function FeedbackPage() {
   const [message, setMessage] = useState("");
+  const [email, setEmail] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => setIsLoggedIn(!!user));
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,15 +26,11 @@ export default function FeedbackPage() {
       data: { user },
     } = await supabase.auth.getUser();
 
-    if (!user) {
-      setStatus("error");
-      setError("Please log in to send feedback.");
-      return;
-    }
-
-    const { error: insertError } = await supabase
-      .from("feedback")
-      .insert({ user_id: user.id, email: user.email, message: message.trim() });
+    const { error: insertError } = await supabase.from("feedback").insert({
+      user_id: user?.id ?? null,
+      email: user?.email ?? (email.trim() || null),
+      message: message.trim(),
+    });
 
     if (insertError) {
       setStatus("error");
@@ -36,6 +39,7 @@ export default function FeedbackPage() {
     }
 
     setMessage("");
+    setEmail("");
     setStatus("sent");
   }
 
@@ -64,6 +68,15 @@ export default function FeedbackPage() {
             placeholder="What's broken, confusing, or missing?"
             className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
           />
+          {!isLoggedIn && (
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Your email (optional, in case I want to follow up)"
+              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            />
+          )}
           <div className="flex items-center gap-3">
             <button
               type="submit"
