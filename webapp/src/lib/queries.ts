@@ -97,12 +97,25 @@ export async function getPaperById(id: string): Promise<Paper | null> {
   return data as Paper | null;
 }
 
-// "More like this" without any AI/embeddings — papers sharing at least one
-// category, newest first, excluding the paper itself.
+// "More like this" without any AI/embeddings — ranked by shared-category
+// count, then by title/abstract text similarity via the same search_vector
+// that powers search. related_papers() ships via a separate migration that
+// may not have landed in every environment yet — degrade to the older
+// category-overlap-only query (recency sort) instead of a 500.
 export async function getRelatedPapers(paper: Paper, limit = 6): Promise<Paper[]> {
   if (paper.categories.length === 0) return [];
 
-  const { data, error } = await supabase
+  const { data, error } = await supabase.rpc("related_papers", {
+    target_paper_id: paper.id,
+    result_limit: limit,
+  });
+
+  if (!error) return data as Paper[];
+  if (error.code !== "PGRST202") {
+    throw new Error(`Failed to load related papers: ${error.message}`);
+  }
+
+  const fallback = await supabase
     .from("papers")
     .select("*")
     .overlaps("categories", paper.categories)
@@ -110,10 +123,10 @@ export async function getRelatedPapers(paper: Paper, limit = 6): Promise<Paper[]
     .order("published_date", { ascending: false, nullsFirst: false })
     .limit(limit);
 
-  if (error) {
-    throw new Error(`Failed to load related papers: ${error.message}`);
+  if (fallback.error) {
+    throw new Error(`Failed to load related papers: ${fallback.error.message}`);
   }
-  return data as Paper[];
+  return fallback.data as Paper[];
 }
 
 // Exact-ish author match — case-insensitive equality against any element of
