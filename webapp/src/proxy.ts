@@ -1,7 +1,8 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { ipAddress } from "@vercel/functions";
 import { rateLimiter } from "@/lib/rateLimit";
+import { SESSION_USER_HEADER } from "@/lib/auth/sessionUser";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
@@ -23,7 +24,11 @@ export async function proxy(request: NextRequest) {
     // fail open
   }
 
-  let response = NextResponse.next({ request });
+  // Never trust a client-supplied copy of the session-user header — always
+  // strip it before we (maybe) set our own validated version below.
+  request.headers.delete(SESSION_USER_HEADER);
+
+  const pendingCookies: { name: string; value: string; options: CookieOptions }[] = [];
 
   const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
     cookies: {
@@ -32,16 +37,35 @@ export async function proxy(request: NextRequest) {
       },
       setAll(cookiesToSet) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
-        response = NextResponse.next({ request });
-        cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options)
-        );
+        pendingCookies.push(...cookiesToSet);
       },
     },
   });
 
-  // Refreshes the auth token if expired — required for SSR sessions to stay alive.
-  await supabase.auth.getUser();
+  // Refreshes the auth token if expired — required for SSR sessions to stay
+  // alive. This also validates the session, so forwarding the result via a
+  // header lets Server Components (and the Sidebar, rendered on every page)
+  // skip calling getUser() again themselves — each call is a network
+  // round-trip to Supabase's Auth server.
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    request.headers.set(
+      SESSION_USER_HEADER,
+      JSON.stringify({
+        id: user.id,
+        email: user.email ?? null,
+        user_metadata: user.user_metadata,
+        app_metadata: user.app_metadata,
+        identities: (user.identities ?? []).map((i) => ({ provider: i.provider })),
+      })
+    );
+  }
+
+  const response = NextResponse.next({ request });
+  pendingCookies.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
 
   return response;
 }

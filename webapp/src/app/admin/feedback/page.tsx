@@ -1,13 +1,10 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { supabaseAdmin } from "@/lib/supabase/admin";
 import { isAdminEmail } from "@/lib/admin";
+import { getSessionUser } from "@/lib/auth/sessionUser";
 
 export default async function AdminFeedbackPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
 
   if (!isAdminEmail(user?.email)) notFound();
 

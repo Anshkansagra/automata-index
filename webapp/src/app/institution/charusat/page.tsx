@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PaperCard } from "@/components/PaperCard";
 import { isCitationStyle } from "@/lib/citation";
 import type { Paper } from "@/lib/types";
+import { getSessionUser } from "@/lib/auth/sessionUser";
 
 // Confirmed via OpenAlex author search + cross-checked co-authorship (all
 // three repeatedly co-author 6G/wireless-communication papers together) —
@@ -23,9 +24,7 @@ export const metadata: Metadata = {
 
 export default async function CharusatInstitutionPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   const citationStyle = isCitationStyle(user?.user_metadata?.citation_style)
     ? user.user_metadata.citation_style
     : undefined;

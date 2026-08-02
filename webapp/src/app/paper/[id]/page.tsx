@@ -10,6 +10,7 @@ import { CiteButton } from "@/components/CiteButton";
 import { PdfPreview } from "@/components/PdfPreview";
 import { AlsoIndexedVia } from "@/components/AlsoIndexedVia";
 import { isCitationStyle } from "@/lib/citation";
+import { getSessionUser } from "@/lib/auth/sessionUser";
 
 const SITE_URL = "https://automata-index.vercel.app";
 
@@ -56,9 +57,7 @@ export default async function PaperDetailPage({
   if (!paper) notFound();
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
   const citationStyle = isCitationStyle(user?.user_metadata?.citation_style)
     ? user.user_metadata.citation_style
     : undefined;

@@ -8,12 +8,11 @@ import { SavedSearchList } from "@/components/SavedSearchList";
 import { SavedPapersExport } from "@/components/SavedPapersExport";
 import { SavedPapersSection } from "@/components/SavedPapersSection";
 import { isCitationStyle } from "@/lib/citation";
+import { getSessionUser } from "@/lib/auth/sessionUser";
 
 export default async function SavedPapersPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
 
   if (!user) {
     redirect("/login");

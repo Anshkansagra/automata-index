@@ -1,18 +1,15 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
 import { SettingsForm } from "@/components/SettingsForm";
+import { getSessionUser } from "@/lib/auth/sessionUser";
 
 export const metadata: Metadata = {
   title: "Settings — Cortexa",
 };
 
 export default async function SettingsPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
 
   if (!user) {
     redirect("/login");

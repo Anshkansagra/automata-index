@@ -1,13 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { supabasePublic } from "@/lib/supabase/public";
 import { getRecentSearchHistory } from "@/lib/searchHistory";
+import { getSessionUser } from "@/lib/auth/sessionUser";
 import { SidebarClient } from "@/components/SidebarClient";
 
 export async function Sidebar() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
 
   const [recentSearches, { count: totalPapers }, savedCountResult] = await Promise.all([
     user ? getRecentSearchHistory(supabase, user.id) : Promise.resolve([]),

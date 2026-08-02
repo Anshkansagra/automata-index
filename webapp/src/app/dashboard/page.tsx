@@ -6,6 +6,7 @@ import { getPapers } from "@/lib/queries";
 import { getSavedPaperIdSet } from "@/lib/savedPapers";
 import { PaperCard } from "@/components/PaperCard";
 import { isCitationStyle } from "@/lib/citation";
+import { getSessionUser } from "@/lib/auth/sessionUser";
 
 async function getStats() {
   const [
@@ -56,9 +57,7 @@ async function getStats() {
 
 export default async function DashboardPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
 
   if (!user) {
     redirect("/login");

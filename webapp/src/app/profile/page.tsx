@@ -5,19 +5,18 @@ import { ProfileForm } from "@/components/ProfileForm";
 import { ApiKeysManager } from "@/components/ApiKeysManager";
 import { getApiKeys } from "@/lib/apiKeys";
 import { isCitationStyle } from "@/lib/citation";
+import { getSessionUser } from "@/lib/auth/sessionUser";
 
 export default async function ProfilePage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getSessionUser();
 
   if (!user) {
     redirect("/login");
   }
 
   const hasPassword = (user.identities ?? []).some((i) => i.provider === "email");
-  const provider = user.app_metadata?.provider ?? "email";
+  const provider = (user.app_metadata?.provider as string | undefined) ?? "email";
   const apiKeys = await getApiKeys(supabase, user.id);
 
   return (
