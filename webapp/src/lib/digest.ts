@@ -3,8 +3,7 @@ import { supabaseAdmin } from "@/lib/supabase/admin";
 import { sendEmail } from "@/lib/email";
 import type { Paper } from "@/lib/types";
 import type { SavedSearch } from "@/lib/savedSearches";
-
-const SITE_URL = "https://automata-index.vercel.app";
+import { SITE_URL } from "@/lib/siteUrl";
 
 async function findNewMatches(search: SavedSearch, since: string): Promise<Paper[]> {
   let query = supabaseAdmin

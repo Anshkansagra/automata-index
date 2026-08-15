@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { Sidebar } from "@/components/Sidebar";
+import { SITE_URL } from "@/lib/siteUrl";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,8 +15,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-const SITE_URL = "https://automata-index.vercel.app";
 const TITLE = "Cortexa — Free Robotics, ML & AI Research";
 const DESCRIPTION =
   "A free, open-access index of robotics, machine learning, deep learning, and AI research from arXiv, MDPI, IEEE Access, CrossRef open-access publishers, and more.";

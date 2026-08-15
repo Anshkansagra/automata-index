@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { SITE_URL } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
   title: "API — Cortexa",
@@ -41,7 +42,7 @@ export default function DevelopersPage() {
           with your key as a bearer token:
         </p>
         <div className="mt-3">
-          <CodeBlock>{`curl "https://automata-index.vercel.app/api/v1/papers?q=robotics&limit=10" \\
+          <CodeBlock>{`curl "${SITE_URL}/api/v1/papers?q=robotics&limit=10" \\
   -H "Authorization: Bearer cortexa_live_..."`}</CodeBlock>
         </div>
       </div>

@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { supabasePublic } from "@/lib/supabase/public";
-
-const BASE_URL = "https://automata-index.vercel.app";
+import { SITE_URL as BASE_URL } from "@/lib/siteUrl";
 
 // Capped at the most recent 5,000 papers — keeps this fast to generate on
 // every crawl request instead of serializing the entire (growing) table.

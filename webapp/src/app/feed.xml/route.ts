@@ -1,7 +1,6 @@
 import { NextRequest } from "next/server";
 import { getPapers, type PaperSort } from "@/lib/queries";
-
-const SITE_URL = "https://automata-index.vercel.app";
+import { SITE_URL } from "@/lib/siteUrl";
 
 function escapeXml(value: string): string {
   return value.replace(/[<>&'"]/g, (c) =>

@@ -11,8 +11,7 @@ import { PdfPreview } from "@/components/PdfPreview";
 import { AlsoIndexedVia } from "@/components/AlsoIndexedVia";
 import { isCitationStyle } from "@/lib/citation";
 import { getSessionUser } from "@/lib/auth/sessionUser";
-
-const SITE_URL = "https://automata-index.vercel.app";
+import { SITE_URL } from "@/lib/siteUrl";
 
 export async function generateMetadata({
   params,
