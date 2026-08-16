@@ -371,6 +371,10 @@ export function SidebarClient({
             <Link href="/about" onClick={() => setOpen(false)} className="hover:text-accent">
               About
             </Link>
+            <span aria-hidden>·</span>
+            <Link href="/privacy" onClick={() => setOpen(false)} className="hover:text-accent">
+              Privacy
+            </Link>
           </div>
 
           {isLoggedIn ? (
