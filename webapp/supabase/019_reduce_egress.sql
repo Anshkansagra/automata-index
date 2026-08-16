@@ -7,7 +7,13 @@
 -- Since search_papers is hit on nearly every search, this was a meaningful,
 -- unnecessary chunk of egress. Switching to an explicit column list drops it
 -- entirely from what's sent over the wire, with no change in behavior.
-create or replace function search_papers(
+-- CREATE OR REPLACE can't change a function's return type in place —
+-- Postgres requires the old signature dropped first.
+drop function if exists search_papers(text, text, integer);
+drop function if exists related_papers(uuid, integer);
+drop function if exists papers_by_author(text, integer);
+
+create function search_papers(
   search_query text,
   filter_source text default null,
   result_limit int default 30
@@ -31,7 +37,7 @@ as $$
   limit result_limit;
 $$;
 
-create or replace function related_papers(
+create function related_papers(
   target_paper_id uuid,
   result_limit int default 6
 )
@@ -70,7 +76,7 @@ as $$
   limit result_limit;
 $$;
 
-create or replace function papers_by_author(author_name text, result_limit int default 50)
+create function papers_by_author(author_name text, result_limit int default 50)
 returns table(
   id uuid, source text, source_id text, doi text, title text, authors text[],
   abstract text, published_date date, categories text[], publisher text,
