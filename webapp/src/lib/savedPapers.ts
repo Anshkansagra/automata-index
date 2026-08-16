@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Paper } from "@/lib/types";
+import { PAPER_COLUMNS } from "@/lib/queries";
 
 // Must be called with the SSR server client (bound to the user's session
 // cookie) so RLS's auth.uid() resolves — the anon/public client has no user
@@ -25,7 +26,7 @@ export async function getSavedPapers(
 ): Promise<SavedPaper[]> {
   const { data, error } = await supabase
     .from("saved_papers")
-    .select("created_at, collection_id, papers(*)")
+    .select(`created_at, collection_id, papers(${PAPER_COLUMNS})`)
     .eq("user_id", userId)
     .order("created_at", { ascending: false });
 

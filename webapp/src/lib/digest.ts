@@ -4,11 +4,12 @@ import { sendEmail } from "@/lib/email";
 import type { Paper } from "@/lib/types";
 import type { SavedSearch } from "@/lib/savedSearches";
 import { SITE_URL } from "@/lib/siteUrl";
+import { PAPER_COLUMNS } from "@/lib/queries";
 
 async function findNewMatches(search: SavedSearch, since: string): Promise<Paper[]> {
   let query = supabaseAdmin
     .from("papers")
-    .select("*")
+    .select(PAPER_COLUMNS)
     .gt("created_at", since)
     .order("created_at", { ascending: false })
     .limit(10);

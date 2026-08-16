@@ -3,6 +3,13 @@ import type { Paper } from "@/lib/types";
 
 export type PaperSort = "recent" | "cited";
 
+// Matches every column of Paper except search_vector — a generated tsvector
+// that's ~44% of a row's payload and is never used client-side (only
+// Postgres's own full-text @@ matching needs it). select("*") was shipping
+// that dead weight over the wire on every browse/detail-page load.
+export const PAPER_COLUMNS =
+  "id, source, source_id, doi, title, authors, abstract, published_date, categories, publisher, pdf_url, landing_page_url, is_open_access, tldr, created_at, citation_count, also_indexed_via";
+
 export async function getPapers({
   q,
   source,
@@ -51,7 +58,7 @@ export async function getPapers({
 
   // No search term: plain browse.
   function buildQuery(useCitationSort: boolean) {
-    let q = supabase.from("papers").select("*").limit(limit);
+    let q = supabase.from("papers").select(PAPER_COLUMNS).limit(limit);
 
     q =
       useCitationSort
@@ -90,7 +97,7 @@ export async function getPapers({
 }
 
 export async function getPaperById(id: string): Promise<Paper | null> {
-  const { data, error } = await supabase.from("papers").select("*").eq("id", id).maybeSingle();
+  const { data, error } = await supabase.from("papers").select(PAPER_COLUMNS).eq("id", id).maybeSingle();
   if (error) {
     throw new Error(`Failed to load paper: ${error.message}`);
   }
@@ -117,7 +124,7 @@ export async function getRelatedPapers(paper: Paper, limit = 6): Promise<Paper[]
 
   const fallback = await supabase
     .from("papers")
-    .select("*")
+    .select(PAPER_COLUMNS)
     .overlaps("categories", paper.categories)
     .neq("id", paper.id)
     .order("published_date", { ascending: false, nullsFirst: false })
