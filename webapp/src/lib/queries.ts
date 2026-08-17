@@ -56,9 +56,11 @@ export async function getPapers({
       : results;
   }
 
-  // No search term: plain browse.
+  // No search term: plain browse. Uses papers_listing (abstract capped at
+  // 400 chars — see PAPER_COLUMNS) since list views only ever show a short
+  // preview; getPaperById queries the base table for the full abstract.
   function buildQuery(useCitationSort: boolean) {
-    let q = supabase.from("papers").select(PAPER_COLUMNS).limit(limit);
+    let q = supabase.from("papers_listing").select(PAPER_COLUMNS).limit(limit);
 
     q =
       useCitationSort
@@ -123,7 +125,7 @@ export async function getRelatedPapers(paper: Paper, limit = 6): Promise<Paper[]
   }
 
   const fallback = await supabase
-    .from("papers")
+    .from("papers_listing")
     .select(PAPER_COLUMNS)
     .overlaps("categories", paper.categories)
     .neq("id", paper.id)
