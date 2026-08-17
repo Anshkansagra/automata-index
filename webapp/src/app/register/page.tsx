@@ -138,6 +138,10 @@ export default function RegisterPage() {
 
               <p className="text-xs text-zinc-500 dark:text-zinc-400">
                 By creating an account, you agree to Cortexa&apos;s{" "}
+                <Link href="/terms" className="text-accent hover:underline">
+                  Terms of Service
+                </Link>{" "}
+                and{" "}
                 <Link href="/privacy" className="text-accent hover:underline">
                   Privacy Policy
                 </Link>

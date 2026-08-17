@@ -106,6 +106,10 @@ export default function LoginPage() {
 
             <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
               New accounts are subject to Cortexa&apos;s{" "}
+              <Link href="/terms" className="text-accent hover:underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
               <Link href="/privacy" className="text-accent hover:underline">
                 Privacy Policy
               </Link>
