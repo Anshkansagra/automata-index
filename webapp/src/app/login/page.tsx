@@ -103,6 +103,14 @@ export default function LoginPage() {
             </div>
 
             <GoogleSignInButton />
+
+            <p className="text-center text-xs text-zinc-500 dark:text-zinc-400">
+              New accounts are subject to Cortexa&apos;s{" "}
+              <Link href="/privacy" className="text-accent hover:underline">
+                Privacy Policy
+              </Link>
+              .
+            </p>
           </form>
 
           <p className="mt-5 text-center text-sm text-zinc-500 dark:text-zinc-400">

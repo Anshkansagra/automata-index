@@ -129,16 +129,55 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
-            Deleting your data
+            Where your data is processed
           </h2>
           <p className="mt-3">
-            You can delete your account at any time from{" "}
-            <Link href="/settings" className="text-accent hover:underline">
-              Settings
-            </Link>
-            . This permanently removes your account, saved papers, collections, saved searches,
-            search history, and API keys. It can&apos;t be undone.
+            The service providers listed above are global infrastructure companies, and your data
+            may be processed on servers outside your country, including in the United States.
+            Each provider maintains its own security and compliance program; Cortexa doesn&apos;t
+            operate any servers of its own.
           </p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+            Your rights
+          </h2>
+          <p className="mt-3">You can, at any time:</p>
+          <ul className="mt-3 flex flex-col gap-2 list-disc pl-5">
+            <li>
+              <strong>Access or correct your data</strong> — view and edit your account and
+              profile fields directly on your{" "}
+              <Link href="/profile" className="text-accent hover:underline">
+                Profile
+              </Link>{" "}
+              and{" "}
+              <Link href="/settings" className="text-accent hover:underline">
+                Settings
+              </Link>{" "}
+              pages.
+            </li>
+            <li>
+              <strong>Request a copy of your data</strong> — email{" "}
+              <a href="mailto:anshkansagra2004@gmail.com" className="text-accent hover:underline">
+                anshkansagra2004@gmail.com
+              </a>{" "}
+              and it will be sent to you. This isn&apos;t automated yet, so allow a few days for a
+              reply.
+            </li>
+            <li>
+              <strong>Delete your data</strong> — delete your account at any time from{" "}
+              <Link href="/settings" className="text-accent hover:underline">
+                Settings
+              </Link>
+              . This permanently removes your account, saved papers, collections, saved searches,
+              search history, and API keys. It can&apos;t be undone.
+            </li>
+            <li>
+              <strong>Raise a concern or complaint</strong> — contact the email above; it will be
+              treated as the grievance/redressal contact for this policy.
+            </li>
+          </ul>
         </section>
 
         <section>
@@ -147,7 +186,7 @@ export default function PrivacyPage() {
           </h2>
           <p className="mt-3">
             Cortexa isn&apos;t directed at children and doesn&apos;t knowingly collect data from
-            anyone under 13.
+            anyone under 18.
           </p>
         </section>
 

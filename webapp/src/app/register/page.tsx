@@ -136,6 +136,14 @@ export default function RegisterPage() {
                 <p className="text-sm text-red-600 dark:text-red-400">{errorMessage}</p>
               )}
 
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                By creating an account, you agree to Cortexa&apos;s{" "}
+                <Link href="/privacy" className="text-accent hover:underline">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+
               <button
                 type="submit"
                 disabled={status === "loading"}
