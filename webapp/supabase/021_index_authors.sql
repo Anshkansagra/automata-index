@@ -9,11 +9,19 @@
 -- multiple author pages compounds it further — enough to hit timeouts.
 --
 -- Fix: a generated lowercase-authors column with a GIN index, so the lookup
--- becomes an indexed array-overlap check instead of a full scan.
+-- becomes an indexed array-overlap check instead of a full scan. Postgres
+-- doesn't allow a subquery directly inside a generated column expression, so
+-- the unnest/lower logic is wrapped in a small immutable function first.
+create or replace function lowercase_text_array(arr text[])
+returns text[]
+language sql
+immutable
+as $$
+  select coalesce(array_agg(lower(x)), '{}'::text[]) from unnest(arr) x;
+$$;
+
 alter table papers add column if not exists authors_lower text[]
-  generated always as (
-    (select coalesce(array_agg(lower(a)), '{}') from unnest(authors) a)
-  ) stored;
+  generated always as (lowercase_text_array(authors)) stored;
 
 create index if not exists papers_authors_lower_idx
   on papers using gin (authors_lower);
