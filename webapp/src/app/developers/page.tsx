@@ -116,6 +116,76 @@ export default function DevelopersPage() {
         </p>
       </div>
 
+      <div className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800">
+        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Claude Connector (MCP)</h2>
+        <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
+          Cortexa is also available as a remote MCP (Model Context Protocol) server, so you can
+          search and pull paper data directly inside a Claude conversation — no account or API
+          key required, same public paper index as the site.
+        </p>
+
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Connector URL</h3>
+          <div className="mt-2">
+            <CodeBlock>{`${SITE_URL}/api/mcp`}</CodeBlock>
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Setup in Claude</h3>
+          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+            In Claude, go to <strong>Settings → Connectors → Add custom connector</strong>, and
+            paste in the URL above. No authentication step — it connects immediately.
+          </p>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Tools</h3>
+          <div className="mt-2 overflow-x-auto rounded-md border border-zinc-200 dark:border-zinc-800">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-zinc-200 text-left text-xs uppercase tracking-wide text-zinc-500 dark:border-zinc-800 dark:text-zinc-400">
+                  <th className="px-3 py-2">Tool</th>
+                  <th className="px-3 py-2">What it does</th>
+                </tr>
+              </thead>
+              <tbody className="text-zinc-700 dark:text-zinc-300">
+                <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                  <td className="px-3 py-2 font-mono text-xs">cortexa_search_papers</td>
+                  <td className="px-3 py-2">Relevance-ranked search by keyword or topic</td>
+                </tr>
+                <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                  <td className="px-3 py-2 font-mono text-xs">cortexa_get_paper</td>
+                  <td className="px-3 py-2">Full details and untruncated abstract for one paper by id</td>
+                </tr>
+                <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                  <td className="px-3 py-2 font-mono text-xs">cortexa_get_papers_by_author</td>
+                  <td className="px-3 py-2">All indexed papers by a specific author name</td>
+                </tr>
+                <tr>
+                  <td className="px-3 py-2 font-mono text-xs">cortexa_get_related_papers</td>
+                  <td className="px-3 py-2">Papers related to a given paper, for exploring a topic</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+            All four tools are read-only — none of them modify any data.
+          </p>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Example prompts</h3>
+          <ul className="mt-2 flex flex-col gap-2 text-sm text-zinc-600 dark:text-zinc-400 list-disc pl-5">
+            <li>&quot;Search Cortexa for recent papers on graph neural networks&quot;</li>
+            <li>&quot;Find open-access papers about VLSI chip design published after 2024&quot;</li>
+            <li>&quot;What papers has Yann LeCun published, according to Cortexa?&quot;</li>
+            <li>&quot;Get the full abstract for Cortexa paper &lt;id&gt;&quot;</li>
+            <li>&quot;Find papers related to that one, so I can explore the topic further&quot;</li>
+          </ul>
+        </div>
+      </div>
+
       <div className="mt-10 flex justify-center gap-4">
         <Link
           href="/methodology"
