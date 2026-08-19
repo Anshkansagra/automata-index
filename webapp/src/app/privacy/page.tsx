@@ -107,6 +107,18 @@ export default function PrivacyPage() {
 
         <section>
           <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
+            Business transfers
+          </h2>
+          <p className="mt-3">
+            If Cortexa is ever acquired, merged, or its assets sold, user data would transfer to
+            the new owner as part of that transaction, subject to the same commitments in this
+            policy. You&apos;d be notified before your data is transferred and becomes subject to
+            a different privacy policy, if one applies.
+          </p>
+        </section>
+
+        <section>
+          <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">
             Cookies
           </h2>
           <p className="mt-3">
