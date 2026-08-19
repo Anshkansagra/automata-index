@@ -70,6 +70,22 @@ export function SavedPapersSection({
     setFilter((f) => (f === id ? null : f));
   }
 
+  async function toggleShare(id: string, makePublic: boolean) {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("collections")
+      .update({ is_public: makePublic })
+      .eq("id", id)
+      .eq("user_id", userId);
+    if (error) return;
+    setCollections((prev) => prev.map((c) => (c.id === id ? { ...c, is_public: makePublic } : c)));
+    if (makePublic) {
+      const url = `${window.location.origin}/collection/${id}`;
+      navigator.clipboard?.writeText(url).catch(() => {});
+      window.alert(`Public link copied:\n${url}`);
+    }
+  }
+
   async function movePaper(paperId: string, collectionId: string | null) {
     setPapers((prev) => prev.map((p) => (p.id === paperId ? { ...p, collection_id: collectionId } : p)));
     const supabase = createClient();
@@ -90,6 +106,15 @@ export function SavedPapersSection({
           <div key={c.id} className="flex items-center gap-1">
             <button type="button" onClick={() => setFilter(c.id)} className={pillClass(filter === c.id)}>
               {c.name} ({counts.get(c.id) ?? 0})
+            </button>
+            <button
+              type="button"
+              onClick={() => toggleShare(c.id, !c.is_public)}
+              aria-label={c.is_public ? `Unshare collection ${c.name}` : `Share collection ${c.name} publicly`}
+              title={c.is_public ? "Public — click to unshare" : "Share publicly"}
+              className={c.is_public ? "text-accent" : "text-zinc-300 hover:text-accent dark:text-zinc-600"}
+            >
+              {c.is_public ? "🔗" : "🔒"}
             </button>
             <button
               type="button"
