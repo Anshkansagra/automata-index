@@ -117,7 +117,7 @@ export default function DevelopersPage() {
       </div>
 
       <div className="mt-12 border-t border-zinc-200 pt-8 dark:border-zinc-800">
-        <h2 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Claude Connector (MCP)</h2>
+        <h2 id="claude-connector-mcp" className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Claude Connector (MCP)</h2>
         <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
           Cortexa is also available as a remote MCP (Model Context Protocol) server, so you can
           search and pull paper data directly inside a Claude conversation — no account or API
