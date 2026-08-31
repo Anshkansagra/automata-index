@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { Sidebar } from "@/components/Sidebar";
+import { SidebarSkeleton } from "@/components/SidebarSkeleton";
 import { SITE_URL } from "@/lib/siteUrl";
 import "./globals.css";
 
@@ -100,7 +102,9 @@ export default function RootLayout({
             }),
           }}
         />
-        <Sidebar />
+        <Suspense fallback={<SidebarSkeleton />}>
+          <Sidebar />
+        </Suspense>
         <div className="flex-1 md:pl-64">{children}</div>
         <Analytics />
       </body>

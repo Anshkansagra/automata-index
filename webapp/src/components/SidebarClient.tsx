@@ -9,14 +9,27 @@ import { createClient } from "@/lib/supabase/client";
 import { deleteSearchHistory } from "@/lib/searchHistory";
 
 type Props = {
+  totalPapers: number;
+};
+
+type SessionInfo = {
   isLoggedIn: boolean;
   userId: string | null;
   name: string;
   email: string;
   avatarUrl: string | null;
   recentSearches: string[];
-  totalPapers: number;
   savedCount: number;
+};
+
+const LOGGED_OUT_SESSION: SessionInfo = {
+  isLoggedIn: false,
+  userId: null,
+  name: "",
+  email: "",
+  avatarUrl: null,
+  recentSearches: [],
+  savedCount: 0,
 };
 
 function HomeIcon() {
@@ -160,33 +173,35 @@ function MiniThemeToggle() {
   );
 }
 
-export function SidebarClient({
-  isLoggedIn,
-  userId,
-  name,
-  email,
-  avatarUrl,
-  recentSearches,
-  totalPapers,
-  savedCount,
-}: Props) {
+export function SidebarClient({ totalPapers }: Props) {
   const [open, setOpen] = useState(false);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
-  const [searches, setSearches] = useState(recentSearches);
-  const [prevRecentSearches, setPrevRecentSearches] = useState(recentSearches);
+  const [session, setSession] = useState<SessionInfo>(LOGGED_OUT_SESSION);
+  const [searches, setSearches] = useState<string[]>([]);
   const router = useRouter();
   const pathname = usePathname();
+  const { isLoggedIn, userId, name, email, avatarUrl, savedCount } = session;
   const links = isLoggedIn ? LOGGED_IN_LINKS : LOGGED_OUT_LINKS;
 
-  // The server passes a fresh recentSearches array on every navigation, but
-  // this component's local state persists across soft navigations (needed
-  // for the optimistic delete below) — so re-sync during render rather than
-  // in an effect when the prop actually changes. React's documented pattern
-  // for "adjusting state when a prop changes."
-  if (recentSearches !== prevRecentSearches) {
-    setPrevRecentSearches(recentSearches);
-    setSearches(recentSearches);
-  }
+  // Session-dependent data (name, avatar, recent searches, saved count) is
+  // fetched here instead of passed down from the server — see
+  // api/session-info/route.ts for why. This component lives in the root
+  // layout and stays mounted across client-side navigations, so this only
+  // runs once per full page load, not on every navigation.
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/session-info")
+      .then((res) => res.json())
+      .then((data: SessionInfo) => {
+        if (cancelled) return;
+        setSession(data);
+        setSearches(data.recentSearches);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   function searchFor(term: string) {
     setOpen(false);
