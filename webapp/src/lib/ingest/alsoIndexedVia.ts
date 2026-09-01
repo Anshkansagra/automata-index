@@ -1,4 +1,5 @@
 import { supabaseAdmin } from "@/lib/supabase/admin";
+import { baseDoi } from "@/lib/ingest/baseDoi";
 
 export type AlsoIndexedEntry = { source: string; publisher: string | null; url: string };
 
@@ -8,15 +9,6 @@ type CandidateRow = {
   publisher: string | null;
   landing_page_url: string;
 };
-
-// Versioned deposits (Zenodo, Mendeley Data, Figshare) mint a distinct DOI
-// per version — e.g. 10.5281/zenodo.X for "version 2" alongside a base
-// 10.5281/zenodo.X.1-style or concept DOI for the same underlying work.
-// Stripping a trailing ".<digits>" catches the common case so version 1 and
-// version 2 of the same deposit are recognized as one paper, not two.
-function baseDoi(doi: string): string {
-  return doi.replace(/\.\d+$/, "");
-}
 
 // Multiple sources sometimes surface the same paper under the same DOI (an
 // arXiv preprint that's later published in IEEE Access, say). papers_doi_unique
