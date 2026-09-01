@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ingestAuthors } from "@/lib/ingest/authors";
 import { isAuthorizedIngestRequest } from "@/lib/ingest/auth";
+import { notifyCronFailure } from "@/lib/ingest/notifyFailure";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -14,6 +15,7 @@ export async function GET(request: NextRequest) {
     const result = await ingestAuthors({ pages: 2, perPage: 100 });
     return NextResponse.json(result);
   } catch (err) {
+    await notifyCronFailure("authors", err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }

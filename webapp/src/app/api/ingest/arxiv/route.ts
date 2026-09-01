@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ingestArxiv } from "@/lib/ingest/arxiv";
 import { isAuthorizedIngestRequest } from "@/lib/ingest/auth";
+import { notifyCronFailure } from "@/lib/ingest/notifyFailure";
 
 export const dynamic = "force-dynamic";
 // Vercel Hobby plan caps serverless functions at 60s — keep default batch
@@ -16,6 +17,7 @@ export async function GET(request: NextRequest) {
     const result = await ingestArxiv({ pages: 1, pageSize: 200 });
     return NextResponse.json(result);
   } catch (err) {
+    await notifyCronFailure("arxiv", err);
     const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }
