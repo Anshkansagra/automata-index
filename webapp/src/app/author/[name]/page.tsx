@@ -11,6 +11,16 @@ import { PersonalizedPaperList } from "@/components/PersonalizedPaperList";
 // promptly.
 export const revalidate = 3600;
 
+// Required for ISR to actually apply to a dynamic segment with no
+// pre-known values — per Next.js docs, without this (even returning an
+// empty array) the route is dynamically rendered regardless of the
+// `revalidate` export above. Confirmed via production headers: the route
+// stayed fully dynamic (Cache-Control: private, no-store) until this was
+// added.
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({
   params,
 }: {
