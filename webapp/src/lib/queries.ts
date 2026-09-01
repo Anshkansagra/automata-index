@@ -3,6 +3,13 @@ import type { Paper } from "@/lib/types";
 
 export type PaperSort = "recent" | "cited";
 
+// If the strict (AND-all-words) search returns fewer results than this,
+// fall back to a broader (OR-any-word) search too — compound/abbreviated
+// topic labels like "CI/CD for ML" often don't appear verbatim in an
+// otherwise-relevant paper's title/abstract, so the strict match alone was
+// returning 0 results even when relevant papers existed.
+const BROAD_FALLBACK_THRESHOLD = 5;
+
 // Matches every column of Paper except search_vector — a generated tsvector
 // that's ~44% of a row's payload and is never used client-side (only
 // Postgres's own full-text @@ matching needs it). select("*") was shipping
@@ -41,16 +48,37 @@ export async function getPapers({
   // search_papers only takes a single source filter, so multi-source
   // selection is applied client-side after the relevance-ranked fetch.
   if (q && q.trim()) {
+    const trimmedQuery = q.trim();
+    const filterSource = selectedSources.length === 1 ? selectedSources[0] : null;
+
     const { data, error } = await supabase.rpc("search_papers", {
-      search_query: q.trim(),
-      filter_source: selectedSources.length === 1 ? selectedSources[0] : null,
+      search_query: trimmedQuery,
+      filter_source: filterSource,
       result_limit: limit,
     });
 
     if (error) {
       throw new Error(`Failed to search papers: ${error.message}`);
     }
-    const results = data as Paper[];
+    let results = data as Paper[];
+
+    if (results.length < BROAD_FALLBACK_THRESHOLD) {
+      const { data: broadData, error: broadError } = await supabase.rpc("search_papers_broad", {
+        search_query: trimmedQuery,
+        filter_source: filterSource,
+        result_limit: limit,
+      });
+
+      // search_papers_broad ships via a separate migration that may not have
+      // landed in every environment yet — degrade to the strict results
+      // alone instead of a 500.
+      if (!broadError && broadData) {
+        const seenIds = new Set(results.map((p) => p.id));
+        const extra = (broadData as Paper[]).filter((p) => !seenIds.has(p.id));
+        results = [...results, ...extra].slice(0, limit);
+      }
+    }
+
     return selectedSources.length > 1
       ? results.filter((p) => selectedSources.includes(p.source))
       : results;
