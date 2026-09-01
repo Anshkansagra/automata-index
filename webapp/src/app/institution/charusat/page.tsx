@@ -1,12 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { getPapersByAuthor } from "@/lib/queries";
-import { getSavedPaperIdSet } from "@/lib/savedPapers";
-import { createClient } from "@/lib/supabase/server";
-import { PaperCard } from "@/components/PaperCard";
-import { isCitationStyle } from "@/lib/citation";
+import { PersonalizedPaperList } from "@/components/PersonalizedPaperList";
 import type { Paper } from "@/lib/types";
-import { getSessionUser } from "@/lib/auth/sessionUser";
+
+// ISR — no session lookup here (see PersonalizedPaperList), so this page can
+// be cached instead of hitting Supabase on every visit. Revalidates hourly
+// so newly-ingested papers still show up reasonably promptly.
+export const revalidate = 3600;
 
 // Confirmed via OpenAlex author search + cross-checked co-authorship (all
 // three repeatedly co-author 6G/wireless-communication papers together) —
@@ -23,16 +24,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CharusatInstitutionPage() {
-  const supabase = await createClient();
-  const user = await getSessionUser();
-  const citationStyle = isCitationStyle(user?.user_metadata?.citation_style)
-    ? user.user_metadata.citation_style
-    : undefined;
-
-  const [perAuthorPapers, savedIds] = await Promise.all([
-    Promise.all(CHARUSAT_AUTHORS.map((name) => getPapersByAuthor(name))),
-    user ? getSavedPaperIdSet(supabase, user.id) : Promise.resolve(new Set<string>()),
-  ]);
+  const perAuthorPapers = await Promise.all(CHARUSAT_AUTHORS.map((name) => getPapersByAuthor(name)));
 
   const byId = new Map<string, Paper>();
   for (const list of perAuthorPapers) {
@@ -76,16 +68,8 @@ export default async function CharusatInstitutionPage() {
           No papers indexed yet — check back after the next ingestion run.
         </p>
       ) : (
-        <div className="papers-columns mt-8">
-          {papers.map((paper) => (
-            <PaperCard
-              key={paper.id}
-              paper={paper}
-              isLoggedIn={!!user}
-              isSaved={savedIds.has(paper.id)}
-              citationStyle={citationStyle}
-            />
-          ))}
+        <div className="mt-8">
+          <PersonalizedPaperList papers={papers} />
         </div>
       )}
     </div>

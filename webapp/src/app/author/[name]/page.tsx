@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPapersByAuthor } from "@/lib/queries";
-import { getSavedPaperIdSet } from "@/lib/savedPapers";
-import { createClient } from "@/lib/supabase/server";
-import { PaperCard } from "@/components/PaperCard";
-import { isCitationStyle } from "@/lib/citation";
-import { getSessionUser } from "@/lib/auth/sessionUser";
+import { PersonalizedPaperList } from "@/components/PersonalizedPaperList";
+
+// ISR — no session lookup here (see PersonalizedPaperList), so this page can
+// be cached instead of hitting Supabase on every visit or crawler request.
+// Confirmed via Vercel's traffic logs this was the single largest cost
+// driver site-wide: 7,800+ hits in 2 hours on this route alone. Revalidates
+// hourly so newly-ingested papers by an author still show up reasonably
+// promptly.
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,
@@ -28,16 +32,7 @@ export default async function AuthorPage({
   const { name } = await params;
   const author = decodeURIComponent(name);
 
-  const supabase = await createClient();
-  const user = await getSessionUser();
-  const citationStyle = isCitationStyle(user?.user_metadata?.citation_style)
-    ? user.user_metadata.citation_style
-    : undefined;
-
-  const [papers, savedIds] = await Promise.all([
-    getPapersByAuthor(author),
-    user ? getSavedPaperIdSet(supabase, user.id) : Promise.resolve(new Set<string>()),
-  ]);
+  const papers = await getPapersByAuthor(author);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-8">
@@ -58,16 +53,8 @@ export default async function AuthorPage({
           No papers found for this author.
         </p>
       ) : (
-        <div className="papers-columns mt-8">
-          {papers.map((paper) => (
-            <PaperCard
-              key={paper.id}
-              paper={paper}
-              isLoggedIn={!!user}
-              isSaved={savedIds.has(paper.id)}
-              citationStyle={citationStyle}
-            />
-          ))}
+        <div className="mt-8">
+          <PersonalizedPaperList papers={papers} />
         </div>
       )}
     </div>

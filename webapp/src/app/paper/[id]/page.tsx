@@ -2,16 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPaperById, getRelatedPapers } from "@/lib/queries";
-import { getSavedPaperIdSet } from "@/lib/savedPapers";
-import { createClient } from "@/lib/supabase/server";
-import { PaperCard } from "@/components/PaperCard";
-import { SaveButton } from "@/components/SaveButton";
-import { CiteButton } from "@/components/CiteButton";
 import { PdfPreview } from "@/components/PdfPreview";
 import { AlsoIndexedVia } from "@/components/AlsoIndexedVia";
-import { isCitationStyle } from "@/lib/citation";
-import { getSessionUser } from "@/lib/auth/sessionUser";
+import { PersonalizedPaperActions } from "@/components/PersonalizedPaperActions";
+import { PersonalizedPaperList } from "@/components/PersonalizedPaperList";
 import { SITE_URL } from "@/lib/siteUrl";
+
+// ISR — no session lookup here (see PersonalizedPaperActions/List), so this
+// page can be cached instead of hitting Supabase on every visit or crawler
+// request. Revalidates hourly so citation-count updates and newly-added
+// related papers still show up reasonably promptly.
+export const revalidate = 3600;
 
 export async function generateMetadata({
   params,
@@ -55,16 +56,7 @@ export default async function PaperDetailPage({
   const paper = await getPaperById(id);
   if (!paper) notFound();
 
-  const supabase = await createClient();
-  const user = await getSessionUser();
-  const citationStyle = isCitationStyle(user?.user_metadata?.citation_style)
-    ? user.user_metadata.citation_style
-    : undefined;
-
-  const [related, savedIds] = await Promise.all([
-    getRelatedPapers(paper),
-    user ? getSavedPaperIdSet(supabase, user.id) : Promise.resolve(new Set<string>()),
-  ]);
+  const related = await getRelatedPapers(paper);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-8">
@@ -147,8 +139,7 @@ export default async function PaperDetailPage({
           >
             Source page
           </a>
-          <CiteButton paper={paper} defaultStyle={citationStyle} />
-          {user && <SaveButton paperId={paper.id} initialSaved={savedIds.has(paper.id)} />}
+          <PersonalizedPaperActions paper={paper} />
         </div>
       </article>
 
@@ -157,17 +148,7 @@ export default async function PaperDetailPage({
           <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
             Related papers
           </h2>
-          <div className="papers-columns">
-            {related.map((r) => (
-              <PaperCard
-                key={r.id}
-                paper={r}
-                isLoggedIn={!!user}
-                isSaved={savedIds.has(r.id)}
-                citationStyle={citationStyle}
-              />
-            ))}
-          </div>
+          <PersonalizedPaperList papers={related} />
         </div>
       )}
     </div>
