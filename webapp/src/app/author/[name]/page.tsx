@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getPapersByAuthor } from "@/lib/queries";
 import { PersonalizedPaperList } from "@/components/PersonalizedPaperList";
+import { SITE_URL } from "@/lib/siteUrl";
 
 // ISR — no session lookup here (see PersonalizedPaperList), so this page can
 // be cached instead of hitting Supabase on every visit or crawler request.
@@ -31,6 +32,12 @@ export async function generateMetadata({
   return {
     title: `${author} — Papers on Cortexa`,
     description: `Open-access papers by ${author}, indexed free on Cortexa.`,
+    // Author names reach this route with inconsistent encoding/casing from
+    // different callers (paper pages, search results, etc.) — without a
+    // canonical, Google treats near-identical variants of the same author's
+    // page as duplicate content with no authoritative version, and may
+    // decline to index any of them. This pins it to the one normalized form.
+    alternates: { canonical: `${SITE_URL}/author/${encodeURIComponent(author)}` },
   };
 }
 

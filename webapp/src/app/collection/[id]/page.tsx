@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { PaperCard } from "@/components/PaperCard";
 import { isCitationStyle } from "@/lib/citation";
 import { getSessionUser } from "@/lib/auth/sessionUser";
+import { SITE_URL } from "@/lib/siteUrl";
 
 export async function generateMetadata({
   params,
@@ -20,6 +21,7 @@ export async function generateMetadata({
   return {
     title: `${collection.name} — a Cortexa collection`,
     description: `A shared reading list of ${collection.papers.length} open-access papers on Cortexa.`,
+    alternates: { canonical: `${SITE_URL}/collection/${collection.id}` },
   };
 }
 

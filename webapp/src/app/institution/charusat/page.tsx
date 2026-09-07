@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getPapersByAuthor } from "@/lib/queries";
 import { PersonalizedPaperList } from "@/components/PersonalizedPaperList";
 import type { Paper } from "@/lib/types";
+import { SITE_URL } from "@/lib/siteUrl";
 
 // ISR — no session lookup here (see PersonalizedPaperList), so this page can
 // be cached instead of hitting Supabase on every visit. Revalidates hourly
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
   title: "CHARUSAT — Papers on Cortexa",
   description:
     "Open-access research from CHARUSAT (Charotar University of Science and Technology) faculty, indexed free on Cortexa.",
+  alternates: { canonical: `${SITE_URL}/institution/charusat` },
 };
 
 export default async function CharusatInstitutionPage() {

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getPapers, type PaperSort } from "@/lib/queries";
 import { getSavedPaperIdSet } from "@/lib/savedPapers";
 import { createClient } from "@/lib/supabase/server";
@@ -13,6 +14,20 @@ import { SaveSearchButton } from "@/components/SaveSearchButton";
 import { logSearch } from "@/lib/searchHistory";
 import { NeuralNetwork } from "@/components/illustrations";
 import { isCitationStyle } from "@/lib/citation";
+import { SITE_URL } from "@/lib/siteUrl";
+
+// The homepage is reachable through many query-string combinations
+// (?q=...&source=...&sort=...&yearFrom=...) that all render the same shell
+// around different search results — without a canonical, Google was
+// treating these as duplicate pages with no authoritative version (flagged
+// in Search Console as "Duplicate without user-selected canonical"). Search
+// results aren't meant to be indexed as separate pages anyway — the actual
+// content lives at /paper/[id], which already has its own canonical — so
+// this always points back to the bare homepage regardless of query params.
+// Merges with (doesn't replace) the root layout's title/description.
+export const metadata: Metadata = {
+  alternates: { canonical: SITE_URL },
+};
 
 export default async function Home({
   searchParams,
