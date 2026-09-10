@@ -7,6 +7,7 @@ import { SignOutButton } from "@/components/SignOutButton";
 import { Avatar } from "@/components/Avatar";
 import { createClient } from "@/lib/supabase/client";
 import { deleteSearchHistory } from "@/lib/searchHistory";
+import { GITHUB_SPONSORS_URL } from "@/lib/siteUrl";
 
 type Props = {
   totalPapers: number;
@@ -91,6 +92,13 @@ function XIcon() {
   return (
     <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2">
       <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+    </svg>
+  );
+}
+function HeartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="currentColor">
+      <path d="M12 21s-7.5-4.6-10-9.3C.4 8.1 2 4.5 5.6 4c2-.3 3.8.6 4.9 2.2C11.6 4.6 13.4 3.7 15.4 4c3.6.5 5.2 4.1 3.6 7.7C16.5 16.4 12 21 12 21z" />
     </svg>
   );
 }
@@ -372,6 +380,17 @@ export function SidebarClient({ totalPapers }: Props) {
         )}
 
         <div className="mt-auto flex flex-col gap-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+          <a
+            href={GITHUB_SPONSORS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setOpen(false)}
+            className="flex items-center justify-center gap-2 rounded-md border border-accent/30 bg-accent-soft px-3 py-2 text-sm font-medium text-accent transition-colors hover:border-accent/60"
+          >
+            <HeartIcon />
+            Support Cortexa
+          </a>
+
           <MiniThemeToggle />
 
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-medium text-zinc-400 dark:text-zinc-500">

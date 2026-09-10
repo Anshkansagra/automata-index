@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { RoboticGripper } from "@/components/illustrations";
 import { supabasePublic } from "@/lib/supabase/public";
+import { GITHUB_SPONSORS_URL } from "@/lib/siteUrl";
 
 export const metadata: Metadata = {
   title: "About — Cortexa",
@@ -72,6 +73,23 @@ export default async function AboutPage() {
             </a>
           </div>
         </div>
+      </div>
+
+      <div className="mt-8 rounded-xl border border-accent/30 bg-accent-soft p-6 text-center">
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">Cortexa is free and stays free</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm text-zinc-600 dark:text-zinc-400">
+          No paywalls, no ads, no account required to search. It runs entirely on hosting and
+          database costs I cover myself — if it&apos;s useful to you, a sponsorship helps keep it
+          running and growing.
+        </p>
+        <a
+          href={GITHUB_SPONSORS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2 text-sm font-medium text-white hover:bg-accent-hover"
+        >
+          Support on GitHub Sponsors
+        </a>
       </div>
 
       <div className="mt-8 flex justify-center">
