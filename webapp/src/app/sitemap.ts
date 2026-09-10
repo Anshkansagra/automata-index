@@ -2,6 +2,12 @@ import type { MetadataRoute } from "next";
 import { supabasePublic } from "@/lib/supabase/public";
 import { SITE_URL as BASE_URL } from "@/lib/siteUrl";
 
+// Without a revalidate window this route re-queries Supabase on every single
+// crawl request — crawlers (Googlebot especially) re-fetch sitemaps often
+// and from rotating IPs, bypassing the per-IP rate limiter entirely. Hourly
+// is plenty fresh for a sitemap while cutting that to one query/hour.
+export const revalidate = 3600;
+
 // Capped at the most recent 5,000 papers — keeps this fast to generate on
 // every crawl request instead of serializing the entire (growing) table.
 const MAX_PAPER_URLS = 5000;
